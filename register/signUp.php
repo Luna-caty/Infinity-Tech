@@ -1,5 +1,17 @@
 <?php
+include("database.php");
 
+if (isset($_POST["registerButton"])) {
+        $firstName = $_POST['firstName'];
+        $lastName = $_POST['lastName'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        $sql = "INSERT INTO users (first_name, last_name, email, password) VALUES ('$firstName', '$lastName', '$email', '$password')";
+        if(!empty($firstName) && !empty($lastName) && !empty($email) && !empty($password))
+        {
+            mysqli_query($connection, $sql);
+        }
+} 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +34,7 @@
         <p id="signInP2">
             Join InfinityTech and access the best high-tech deals.
         </p>
-        <form action="signIn.php" method="post">
+        <form action="signUp.php" method="post">
             <div class="name">
                 <input type="text" name="firstName" id="firstName" placeholder="First Name" required>
                 <br>
@@ -33,10 +45,9 @@
             <br>
             <input type="password" name="password" id="password" placeholder="Password" required>
             <br>
-            <input type="password" name="password" id="password" placeholder="confirme Password" required>
-            <br>
             <div class="button">
-                <button type="submit" id="registerButton">Create account</button>
+                <!-- <button type="submit" id="registerButton" name="registerButton">Create account</button> -->
+                <input type="submit" value="Create account" id="registerButton" name="registerButton">
             </div>
             <br>
             <p id="signUptext">already have one ?<a href="signIn.php" id="signUpLink">Sign up </a></p>
@@ -44,3 +55,4 @@
 </body>
 
 </html>
+
