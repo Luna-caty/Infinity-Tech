@@ -9,6 +9,7 @@ CREATE TABLE Users (
 
 CREATE TABLE Laptops (
     id_pc INT PRIMARY KEY AUTO_INCREMENT,
+    id_product INT UNIQUE, 
     reference VARCHAR(50) UNIQUE,
     name_pc VARCHAR(100) NOT NULL,
     marque VARCHAR(50) NOT NULL,
@@ -25,10 +26,12 @@ CREATE TABLE Laptops (
     prix DECIMAL(10,2) NOT NULL,
     quantite_stock INT NOT NULL DEFAULT 0,
     image_principale VARCHAR(255),
+    FOREIGN KEY (id_product) REFERENCES Products(id_product) ON DELETE CASCADE
 );
 
 CREATE TABLE Smartphones (
     id_phone INT PRIMARY KEY AUTO_INCREMENT,
+    id_product INT UNIQUE, 
     reference VARCHAR(50) UNIQUE,
     phone_name VARCHAR(100) NOT NULL,
     marque VARCHAR(50) NOT NULL,
@@ -46,9 +49,11 @@ CREATE TABLE Smartphones (
     prix DECIMAL(10,2) NOT NULL,
     quantite_stock INT NOT NULL DEFAULT 0,
     image_principale VARCHAR(255),
+    FOREIGN KEY (id_product) REFERENCES Products(id_product) ON DELETE CASCADE
 );
 CREATE TABLE Accessoires (
     id_accessoire INT PRIMARY KEY AUTO_INCREMENT,
+    id_product INT UNIQUE, 
     reference VARCHAR(50) UNIQUE,
     name VARCHAR(100) NOT NULL,
     marque VARCHAR(50) NOT NULL,
@@ -58,10 +63,12 @@ CREATE TABLE Accessoires (
     description TEXT,
     prix DECIMAL(10,2) NOT NULL,
     quantite_stock INT NOT NULL DEFAULT 0,
-    image_principale VARCHAR(255)
+    image_principale VARCHAR(255),
+    FOREIGN KEY (id_product) REFERENCES Products(id_product) ON DELETE CASCADE
 );
 CREATE TABLE Stockage_Composants (
     id_composant INT PRIMARY KEY AUTO_INCREMENT,
+    id_product INT UNIQUE, 
     reference VARCHAR(50) UNIQUE,
     name VARCHAR(100) NOT NULL,
     marque VARCHAR(50) NOT NULL,
@@ -72,18 +79,16 @@ CREATE TABLE Stockage_Composants (
     description TEXT,
     prix DECIMAL(10,2) NOT NULL,
     quantite_stock INT NOT NULL DEFAULT 0,
-    image_principale VARCHAR(255)
+    image_principale VARCHAR(255),
+    FOREIGN KEY (id_product) REFERENCES Products(id_product) ON DELETE CASCADE
 );
 
 CREATE TABLE Products (
     id_product INT PRIMARY KEY AUTO_INCREMENT,
-    type ENUM('laptop', 'smartphone', 'accessoire') NOT NULL,
-    id_laptop INT,
-    id_smartphone INT,
-    id_accessoire INT,
-    FOREIGN KEY (id_laptop) REFERENCES Laptops(id_pc),
-    FOREIGN KEY (id_smartphone) REFERENCES Smartphones(id_phone),
-    FOREIGN KEY (id_accessoire) REFERENCES Accessoires(id_accessoire)
+    name VARCHAR(100) NOT NULL,
+    prix DECIMAL(10,2) NOT NULL,
+    image_principale VARCHAR(255),
+    type ENUM('laptop', 'smartphone', 'accessoire', 'composant') NOT NULL
 );
 -- une table pour stocker plusieurs images
 CREATE TABLE Images (
