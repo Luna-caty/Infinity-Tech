@@ -1,8 +1,3 @@
-<?php
-?>
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,32 +12,13 @@
 </head>
 
 <body>
-
-    <nav>
-        <div class="navbar">
-            <div class="logo">
-                <img src="../assets/logo.png" alt="logo">
-                <span>Infinity-Tech</span>
-
-            </div>
-            <ul class="nav-menu">
-                <li><a href="home.php">Home</a></li>
-                <li><a href="shop.php">Shop</a></li>
-                <li><a href="accessoires.php">Accessoires</a></li>
-                <li><a href="laptops.php">Laptops</a></li>
-            </ul>
-            <div class="nav_actions">
-                <img src="../assets/cart.png" alt="cart" class="cart-icon">
-                <a href="../register/signUp.php" class="register-btn">Register</a>
-            </div>
-        </div>
-    </nav>
+    <?php include '../reusables/navbar.php'; ?>
     <div class="hero">
         <div class="hero-texts">
             <p id="hero1">InfinityTech – The Ultimate Electronics & IT Store</p>
             <p id="hero2">Discover a wide range of products: computers, phones, peripherals, storage, and more</p>
             <div>
-                <button id="callToAction"> Shop Now </button>
+                <a href="../shop/shop.php" id="callToAction">Shop Now</a>
             </div>
         </div>
         <img src="../assets/hero.png" alt="hero" class="hero-image">
@@ -55,7 +31,7 @@
                 <img src="../assets/laptop.png" alt="Laptop" class="product-image">
                 <div class="product-info">
                     <h2 class="categorie-name">Laptop</h2>
-                    <a href="#" class="shop-now-btn">Shop Now</a>
+                    <a href="../shop/shop.php" class="shop-now-btn">Shop Now</a>
                 </div>
             </div>
 
@@ -112,49 +88,10 @@
                 <div class="bestSeller-btn">
                     <a href="#" class="details-btn">See more details</a>
                 </div>
-
             </div>
         </div>
     </section>
-    <footer>
-    <div class="footer-container">
-        <div class="footer-left">
-            <div class="footer-logo">
-                <img src="../assets/whiteLogo.png" alt="InfinityTech Logo">
-                <span class="footer-logo-text">InfinityTech</span>
-            </div>
-            <p class="footer-description">
-                Votre boutique en ligne en électronique et informatique. 
-                Retrouvez une sélection de PC, smartphones et accessoires high-tech de qualité, avec un service client à votre écoute.
-            </p>
-        </div>
-        
-        <div class="quick-links">
-            <h3>Quick Links</h3>
-            <a href="home.php">Home</a>
-            <a href="about.php">About us</a>
-            <a href="contact.php">Contact us</a>
-        </div>
-        
-        <div class="get-in-touch">
-            <h3>Get In Touch</h3>
-            <p class="getitTouchP"> find us in social</p>
-            <div class="social-icons">
-                <img src="../assets/social media.png" alt="social media">
-            </div>
-            <div class="payment-icons">
-                <img src="../assets/payment.png" alt="payment methods">
-            </div>
-        </div>
-    </div>
-    <div class="copyright">
-        <p id="copyright-text">
-            &copy;Copyright 2025 InfinityTech. All Rights Reserved
-        </p> 
-    </div>
-</footer>
-
-
+    <?php include '../reusables/footer.php'; ?>
 </body>
 
 </html>

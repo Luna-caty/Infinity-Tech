@@ -1,6 +1,6 @@
 <?php
 require_once '../register/database.php';
-$select = "SELECT name,prix,image_principale FROM products";
+$select = "SELECT * FROM products";
 $show_products = mysqli_query($connection, $select);
 
 ?>
@@ -18,25 +18,7 @@ $show_products = mysqli_query($connection, $select);
 </head>
 
 <body>
-    <nav>
-        <div class="navbar">
-            <div class="logo">
-                <img src="../assets/logo.png" alt="logo">
-                <span>Infinity-Tech</span>
-
-            </div>
-            <ul class="nav-menu">
-                <li><a href="home.php">Home</a></li>
-                <li><a href="shop.php">Shop</a></li>
-                <li><a href="accessoires.php">Accessoires</a></li>
-                <li><a href="laptops.php">Laptops</a></li>
-            </ul>
-            <div class="nav_actions">
-                <img src="../assets/cart.png" alt="cart" class="cart-icon">
-                <a href="../register/signUp.php" class="register-btn">Register</a>
-            </div>
-        </div>
-    </nav>
+    <?php include '../reusables/navbar.php'; ?>
     <div class="filter">
         <div class="by-category">
             <select name="category" id="category">
@@ -74,48 +56,11 @@ $show_products = mysqli_query($connection, $select);
             echo '<img src="../assets/' . htmlspecialchars($row['image_principale']) . '" alt="' . htmlspecialchars($row['name']) . '" class="product-image">';
             echo '<h3 class="product-name">' . htmlspecialchars($row['name']) . '</h3>';
             echo '<p class="product-price">' . number_format($row['prix'], 2, ',', ' ') . '€</p>';
-            echo '<a href="#" class="see-more-btn">See more</a>';
+            echo '<a href="../productDetail/product_detail.php?id=' . htmlspecialchars($row['id_product']) . '" class="see-more-btn">See more</a>';
             echo '</div>';
         }
         ?>
-    </div>
-    <footer>
-        <div class="footer-container">
-            <div class="footer-left">
-                <div class="footer-logo">
-                    <img src="../assets/whiteLogo.png" alt="InfinityTech Logo">
-                    <span class="footer-logo-text">InfinityTech</span>
-                </div>
-                <p class="footer-description">
-                    Votre boutique en ligne en électronique et informatique.
-                    Retrouvez une sélection de PC, smartphones et accessoires high-tech de qualité, avec un service client à votre écoute.
-                </p>
-            </div>
-
-            <div class="quick-links">
-                <h3>Quick Links</h3>
-                <a href="home.php">Home</a>
-                <a href="about.php">About us</a>
-                <a href="contact.php">Contact us</a>
-            </div>
-
-            <div class="get-in-touch">
-                <h3>Get In Touch</h3>
-                <p class="getitTouchP"> find us in social</p>
-                <div class="social-icons">
-                    <img src="../assets/social media.png" alt="social media">
-                </div>
-                <div class="payment-icons">
-                    <img src="../assets/payment.png" alt="payment methods">
-                </div>
-            </div>
-        </div>
-        <div class="copyright">
-            <p id="copyright-text">
-                &copy;Copyright 2025 InfinityTech. All Rights Reserved
-            </p>
-        </div>
-    </footer>
+        <?php include '../reusables/footer.php'; ?>
 </body>
 
 </html>
