@@ -1,9 +1,59 @@
 <?php
 require_once '../register/database.php';
-$select = "SELECT * FROM products";
+
+$category = isset($_POST['category']) ? $_POST['category'] : '';
+$price_order = isset($_POST['price']) ? $_POST['price'] : '';
+$alphabetical_order = isset($_POST['alphabetical']) ? $_POST['alphabetical'] : '';
+
+
+$select = "SELECT * FROM products where 1";
+
+if (!empty($category)) {
+    $select .= " AND type = '" . mysqli_real_escape_string($connection, $category) . "'";
+}
+
+if (!empty($price_order)) {
+    if ($price_order == 'low-to-high') {
+        $select .= " ORDER BY prix ASC";
+    } elseif ($price_order == 'high-to-low') {
+        $select .= " ORDER BY prix DESC";
+    }
+} elseif (!empty($alphabetical_order)) {
+    if ($alphabetical_order == 'a-to-z') {
+        $select .= " ORDER BY name ASC";
+    } elseif ($alphabetical_order == 'z-to-a') {
+        $select .= " ORDER BY name DESC";
+    }
+} else {
+    // ordre par defaut 
+    $select .= " ORDER BY id_product ASC";
+}
+
+/*
+On utilise '.=' pour ajouter des conditions et tris à la requête SQL
+sans écraser les conditions précédentes.
+par exemple:
+avant l'ajout des conditions le $select =select *from products
+apres si on ajoute un filtre de category laptop
+donc c'est $select .= " WHERE type = 'laptop'";
+et si on ajoute un filtre de tri de prix 
+on aura :$select .= " ORDER BY prix ASC";
+donc finalement la requete final sera 
+SELECT * FROM products WHERE type = 'laptop' ORDER BY prix ASC;
+donc le .= nous a aider a concatainer plusieurs requete pour avoir la requete final
+
+*/
+
 $show_products = mysqli_query($connection, $select);
 
+// Vérification des erreurs de requête
+if (!$show_products) {
+    die("Erreur de requête: " . mysqli_error($connection));
+}
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,48 +69,47 @@ $show_products = mysqli_query($connection, $select);
 
 <body>
     <?php include '../reusables/navbar.php'; ?>
-    <div class="filter">
-        <div class="by-category">
-            <select name="category" id="category">
-                <option value="" disabled selected>Categories</option>
-                <option value="laptops">Laptops</option>
-                <option value="phones">Phones</option>
-                <option value="accessories">Accessories</option>
-                <option value="storage">Storage</option>
-            </select>
-        </div>
 
-        <div class="by-price">
-            <select name="price" id="price">
-                <option value="" disabled selected>Price</option>
-                <option value="low-to-high">Low to High</option>
-                <option value="high-to-low">High to Low</option>
-            </select>
-        </div>
+    <form method="POST" action="shop.php" class="filter">
+        <select name="category">
+            <option value="" disabled selected>Categories</option>
+            <option value="laptop" <?= $category == 'laptop' ? 'selected' : '' ?>>Laptop</option>
+            <option value="smartphone" <?= $category == 'phones' ? 'selected' : '' ?>>smartPhones</option>
+            <option value="accessorie" <?= $category == 'accessories' ? 'selected' : '' ?>>Accessories</option>
+            <option value="composant" <?= $category == 'accessories' ? 'selected' : '' ?>>composants</option>
 
-        <div class="by-alphabetical">
-            <select name="alphabetical" id="alphabetical">
-                <option value="" disabled selected>Alphabetical</option>
-                <option value="a-to-z">A to Z</option>
-                <option value="z-to-a">Z to A</option>
-            </select>
-        </div>
-        <div class="filter-btn">
-            <input type="button" value="Filter" id="filter-btn">
-        </div>
-    </div>
+        </select>
+        <select name="price">
+            <option value="" disabled selected>Price</option>
+            <option value="low-to-high" <?= $price_order == 'low-to-high' ? 'selected' : '' ?>>Low to High</option>
+            <option value="high-to-low" <?= $price_order == 'high-to-low' ? 'selected' : '' ?>>High to Low</option>
+        </select>
+        <select name="alphabetical">
+            <option value="" disabled selected>Alphabetical</option>
+            <option value="a-to-z" <?= $alphabetical_order == 'a-to-z' ? 'selected' : '' ?>>A to Z</option>
+            <option value="z-to-a" <?= $alphabetical_order == 'z-to-a' ? 'selected' : '' ?>>Z to A</option>
+        </select>
+        <input type="submit" value="Filter" id="filter-btn">
+    </form>
+
     <div class="products">
         <?php
-        while ($row = mysqli_fetch_assoc($show_products)) {
-            echo '<div class="product-card">';
-            echo '<img src="../assets/' . htmlspecialchars($row['image_principale']) . '" alt="' . htmlspecialchars($row['name']) . '" class="product-image">';
-            echo '<h3 class="product-name">' . htmlspecialchars($row['name']) . '</h3>';
-            echo '<p class="product-price">' . number_format($row['prix'], 2, ',', ' ') . '€</p>';
-            echo '<a href="../productDetail/product_detail.php?id=' . htmlspecialchars($row['id_product']) . '" class="see-more-btn">See more</a>';
-            echo '</div>';
+        if (mysqli_num_rows($show_products) > 0) {
+            while ($row = mysqli_fetch_assoc($show_products)) {
+                echo '<div class="product-card">';
+                echo '<img src="../assets/' . htmlspecialchars($row['image_principale']) . '" alt="' . htmlspecialchars($row['name']) . '" class="product-image">';
+                echo '<h3 class="product-name">' . htmlspecialchars($row['name']) . '</h3>';
+                echo '<p class="product-price">' . number_format($row['prix'], 2, ',', ' ') . '€</p>';
+                echo '<a href="../productDetail/product_detail.php?id=' . htmlspecialchars($row['id_product']) . '" class="see-more-btn">See more</a>';
+                echo '</div>';
+            }
+        } else {
+            echo '<p class="no-products">No products found matching your criteria.</p>';
         }
         ?>
-        <?php include '../reusables/footer.php'; ?>
+    </div>
+
+    <?php include '../reusables/footer.php'; ?>
 </body>
 
 </html>
