@@ -1,3 +1,15 @@
+<?php
+require_once '../register/database.php';
+
+$random_query = "SELECT * FROM products ORDER BY RAND() LIMIT 3";
+$random_result = mysqli_query($connection, $random_query);
+
+?>
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,7 +25,7 @@
 
 <body>
     <?php include '../reusables/navbar.php'; ?>
-    <div class="hero">
+    <div class="hero animate-on-load">
         <div class="hero-texts">
             <p id="hero1">InfinityTech – The Ultimate Electronics & IT Store</p>
             <p id="hero2">Discover a wide range of products: computers, phones, peripherals, storage, and more</p>
@@ -24,14 +36,14 @@
         <img src="../assets/hero.png" alt="hero" class="hero-image">
     </div>
 
-    <div class="categories">
+    <div class="categories animate-on-load">
         <p id="categories-title">Our Categories</p>
         <div class="product-cards">
             <div class="product-card">
                 <img src="../assets/laptop.png" alt="Laptop" class="product-image">
                 <div class="product-info">
                     <h2 class="categorie-name">Laptop</h2>
-                    <a href="../shop/shop.php" class="shop-now-btn">Shop Now</a>
+                    <a href="../shop/shop.php?type=laptop" class="shop-now-btn">Shop Now</a>
                 </div>
             </div>
 
@@ -39,7 +51,7 @@
                 <img src="../assets/phones.png" alt="Phone" class="product-image">
                 <div class="product-info">
                     <h2 class="categorie-name">Phone</h2>
-                    <a href="#" class="shop-now-btn">Shop Now</a>
+                    <a href="../shop/shop.php?type=smartphone" class="shop-now-btn">Shop Now</a>
                 </div>
             </div>
 
@@ -47,7 +59,7 @@
                 <img src="../assets/accessoires.png" alt="accessoires" class="product-image">
                 <div class="product-info">
                     <h2 class="categorie-name">Accessoires</h2>
-                    <a href="#" class="shop-now-btn">Shop Now</a>
+                    <a href="../shop/shop.php?type=accessoire" class="shop-now-btn">Shop Now</a>
                 </div>
             </div>
 
@@ -55,41 +67,33 @@
                 <img src="../assets/components.png" alt="components" class="product-image">
                 <div class="product-info">
                     <h2 class="categorie-name">Stockage & Composants</h2>
-                    <a href="#" class="shop-now-btn">Shop Now</a>
+                    <a href="../shop/shop.php?type=composant" class="shop-now-btn">Shop Now</a>
                 </div>
             </div>
         </div>
     </div>
-    <section class="best-seller-section">
-        <h2 class="best-seller-title">BEST SELLER</h2>
-        <div class="best-seller-products">
-            <div class="bestSeller-card">
-                <img src="../assets/ASUS.png" alt="ASUS ROG Strix G15" class="product-image">
-                <h3 class="product-name">ASUS ROG Strix G15 - RTX 4060</h3>
-                <p class="product-price">1,299€</p>
-                <div class="bestSeller-btn">
-                    <a href="#" class="details-btn">See more details</a>
-                </div>
-            </div>
+    <h2 class="best-seller-title animate-on-load">BEST SELLER</h2>
+    <section class="best-seller-section animate-on-load">
 
-            <div class="bestSeller-card">
-                <img src="../assets/iphone15pro.png" alt="iPhone 15 Pro Max" class="product-image">
-                <h3 class="product-name">iPhone 15 Pro Max - 256Go</h3>
-                <p class="product-price">1,199€</p>
-                <div class="bestSeller-btn">
-                    <a href="#" class="details-btn">See more details</a>
-                </div>
-            </div>
+        <?php
+        if (mysqli_num_rows($random_result) > 0) {
+            while ($row = mysqli_fetch_assoc($random_result)) {
+                echo '<div class="best-seller-products">';
+                echo ' <div class="bestSeller-card">';
+                echo '<img src="../assets/' . htmlspecialchars($row['image_principale']) . '" alt="' . htmlspecialchars($row['name']) . '" class="product-image">';
+                echo '<h3 class="product-name">' . htmlspecialchars($row['name']) . '</h3>';
+                echo '<p class="product-price">' . number_format($row['prix'], 2, ',', ' ') . '€</p>';
+                echo '<div class="bestSeller-btn">';
+                echo '<a href="../productDetail/product_detail.php?id=' . htmlspecialchars($row['id_product']) . '" class="details-btn">See more</a>';
+                echo '</div>';
+                echo '</div>';
+                echo '</div>';
+            }
+        } else {
+            echo '<p class="no-products">No products found matching your criteria.</p>';
+        }
+        ?>
 
-            <div class="bestSeller-card">
-                <img src="../assets/casque.png" alt="Logitech G Pro Headset" class="product-image">
-                <h3 class="product-name">Casque Gamer Logitech G Pro</h3>
-                <p class="product-price">129€</p>
-                <div class="bestSeller-btn">
-                    <a href="#" class="details-btn">See more details</a>
-                </div>
-            </div>
-        </div>
     </section>
     <?php include '../reusables/footer.php'; ?>
 </body>
