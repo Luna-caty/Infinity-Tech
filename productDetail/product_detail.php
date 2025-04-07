@@ -79,10 +79,62 @@ if (isset($_GET['id'])) {
                 echo $product['prix'] . "€";
                 ?>
             </p>
-            <div>
-                <button id="add-to-cart">Add to Cart <img src="../assets/whitecart.png"> </button>
-            </div>
+            <form action="cart.php" method="POST">
+                <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_id); ?>">
+                <button id="add-to-cart" type="submit" style="text-decoration: none; color: white;">
+                    Add to Cart <img src="../assets/whitecart.png" alt="Icon Cart">
+                </button>
+            </form>
         </div>
+    </div>
+    <div class="product_more_details">
+        <p class="product_details_title">
+            Description Detailée :
+        </p>
+        <div class="more_details_content">
+            <?php
+            if ($product['type'] == 'laptop') {
+                echo "CPU: " . $product_details['cpu'] . "<br>";
+                echo "GPU: " . $product_details['gpu'] . "<br>";
+                echo "RAM: " . $product_details['ram'] . "<br>";
+                echo "Stockage: " . $product_details['stockage'] . "<br>";
+                echo "Ecran: " . $product_details['ecran'] . "<br>";
+                echo "Batterie: " . $product_details['batterie'] . "<br>";
+                echo "Design: " . $product_details['design'] . "<br>";
+                echo "Poids: " . $product_details['poids'] . "<br>";
+            } elseif ($product['type'] == 'smartphone') {
+                echo "Processeur: " . $product_details['processeur'] . "<br>";
+                echo "Ecran : " . $product_details['ecran'] . "<br>";
+                echo "RAM: " . $product_details['ram'] . "<br>";
+                echo "Stockage: " . $product_details['stockage'] . "<br>";
+                echo "Appereil Photo :" . $product_details['appareil_photo'] . "<br>";
+                echo "Batterie: " . $product_details['batterie'] . "<br>";
+                echo "Securité : " . $product_details['securite'] . "<br>";
+                echo "Design : " . $product_details['design'] . "<br>";
+                echo "Dimensions : " . $product_details['dimensions'] . "<br>";
+                echo "Poids : " . $product_details['poids'] . "<br>";
+            
+            } 
+            elseif ($product['type'] == 'accessoire') {
+                echo "Type: " . $product_details['type_accessoire'] . "<br>";
+                echo "Compatibilité: " . $product_details['compatibilite'] . "<br>";
+                echo "Specifications: " . $product_details['specifications'] . "<br>";
+            } 
+            
+            elseif ($product['type'] == 'composant') {
+                echo "Marque: " . $product_details['marque'] . "<br>";
+                echo "Type du Composant : " . $product_details['type_composant'] . "<br>";
+                echo "Specifications: " . $product_details['specifications'] . "<br>";
+                if (is_null($product_details['capacite'])) {
+                    echo "Capacité: // <br>";
+                } else {
+                    echo "Capacité: " . $product_details['capacite'] . "<br>";
+                }
+                echo "Compatibilité: " . $product_details['compatibilite'] . "<br>";
+            }
+            ?>
+        </div>
+
     </div>
     <?php include '../reusables/footer.php'; ?>
 </body>

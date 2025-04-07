@@ -10,10 +10,10 @@ body {
 }
 
 #product-name {
-    font-family: "Poppins", sans-serif;
-    font-weight: 600;
-    font-style: normal;
-    font-size: 30px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 30px;
 }
 #product-text {
   font-family: "Poppins", sans-serif;
@@ -26,53 +26,74 @@ body {
   font-family: "Poppins", sans-serif;
   font-weight: 800;
   font-style: normal;
-  font-size: 18px;
+  font-size: 21px;
 }
-#add-to-cart
-{
-    background-color: #12298C;
-    color: white;
-    font-family: "Poppins", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-    border: none;
-    font-size: 23px;
+#add-to-cart {
+  background-color: #12298c;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  border: none;
+  font-size: 23px;
+}
+button img {
+  height: 20px;
+  width: 20px;
+  margin-right: 5px;
+}
+.product-description {
+  display: flex;
+  flex-direction: column;
+  /* align-items: flex-end; */
+}
+.product-image {
+  background-color: #e8e8e8;
+  width: 400px;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+}
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.product-detail {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 40px;
+  margin-right: 40px;
+}
+.product_more_details {
+  margin-left: 40px;
+  margin-right: 40px;
+  margin-top: 30px;
+}
 
+.product_details_title {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: italic;
+  font-size: 32px;
+  margin-bottom: 15px; /* Ajout d'une marge pour séparer du contenu */
+  color: #000; /* Couleur noire par défaut */
 }
-button img
-{
-    height: 20px;
-    width: 20px;
-    margin-right: 5px;
-}
-.product-description
-{
-    display: flex;
-    flex-direction: column;
-    /* align-items: flex-end; */
-}
-.product-image
-{
-    background-color: #E8E8E8;
-    width: 400px;
-    height: 400px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 40px;
 
+.more_details_content {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 23px;
+  line-height: 1.4; /* Améliore la lisibilité */
 }
-.product-image img
-{
-    width:100%;
-    height: 100%;
-    object-fit: contain;
-    
+.test{
+  border: 3px solid #12298c;
+  background-color: brown;
 }
-.product-detail
-{
-    display: flex;
-    justify-content: space-between;
-    margin-left: 40px;
-    margin-right: 40px;
+.testP{
+  font-size: 40px;
 }
