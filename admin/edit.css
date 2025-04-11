@@ -95,3 +95,44 @@ button:hover {
   max-width: 1200px;
   margin: 0 auto;
 }
+.cancel-button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 15px;
+  background-color: #f44336; /* rouge doux */
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  margin-right: 20px;
+}
+
+.cancel-button:hover {
+  background-color: #d32f2f; /* un peu plus foncé au hover */
+}
+.edit-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+#editP {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 30px;
+  text-align: center;
+  color: #124e8b;
+}
+.edit-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
