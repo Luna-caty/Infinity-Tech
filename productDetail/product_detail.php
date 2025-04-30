@@ -1,12 +1,41 @@
 <?php
 require_once '../register/database.php';
-// le 'id ' est celui qu'il a dans l'url 
+session_start();
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../register/signIn.php");
+    exit;
+}
+
+// Gestion de l'ajout au panier
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['product_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $product_id = intval($_POST['product_id']);
+    
+    // Vérifier si le produit existe déjà dans le panier
+    $check_query = "SELECT * FROM cart WHERE user_id = $user_id AND product_id = $product_id";
+    $check_result = mysqli_query($connection, $check_query);
+    
+    if (mysqli_num_rows($check_result) > 0) {
+        // Produit existe déjà, incrémenter la quantité
+        $update_query = "UPDATE cart SET quantity = quantity + 1 WHERE user_id = $user_id AND product_id = $product_id";
+        mysqli_query($connection, $update_query);
+    } else {
+        // Nouveau produit, l'ajouter au panier
+        $insert_query = "INSERT INTO cart (user_id, product_id, quantity) VALUES ($user_id, $product_id, 1)";
+        mysqli_query($connection, $insert_query);
+    }
+    
+    // Rediriger vers la page du panier
+    header("Location: ../cart/cart.php");
+    exit();
+}
+
+// Récupération des détails du produit
 if (isset($_GET['id'])) {
     $product_id = intval($_GET['id']);
     $query = "SELECT * FROM products WHERE id_product = $product_id";
     $result = mysqli_query($connection, $query);
-
 
     if ($result && mysqli_num_rows($result) > 0) {
         $product = mysqli_fetch_assoc($result);
@@ -27,6 +56,7 @@ if (isset($_GET['id'])) {
                 $select_query = null;
                 break;
         }
+        
         if ($select_query) {
             $select_query = mysqli_query($connection, $select_query);
             if ($select_query && mysqli_num_rows($select_query) > 0) {
@@ -40,8 +70,8 @@ if (isset($_GET['id'])) {
         exit;
     }
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -53,6 +83,8 @@ if (isset($_GET['id'])) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="product_detail.css">
+    <link rel="icon" href="../assets/icon2.png" type="image/png">
+
 </head>
 
 <body>
@@ -79,7 +111,8 @@ if (isset($_GET['id'])) {
                 echo $product['prix'] . "€";
                 ?>
             </p>
-            <form action="cart.php" method="POST">
+            <!-- Formulaire qui pointe vers la page courante -->
+            <form action="<?php echo $_SERVER['PHP_SELF'] . '?id=' . htmlspecialchars($product_id); ?>" method="POST">
                 <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_id); ?>">
                 <button id="add-to-cart" type="submit" style="text-decoration: none; color: white;">
                     Add to Cart <img src="../assets/whitecart.png" alt="Icon Cart">
@@ -113,15 +146,11 @@ if (isset($_GET['id'])) {
                 echo "Design : " . $product_details['design'] . "<br>";
                 echo "Dimensions : " . $product_details['dimensions'] . "<br>";
                 echo "Poids : " . $product_details['poids'] . "<br>";
-            
-            } 
-            elseif ($product['type'] == 'accessoire') {
+            } elseif ($product['type'] == 'accessoire') {
                 echo "Type: " . $product_details['type_accessoire'] . "<br>";
                 echo "Compatibilité: " . $product_details['compatibilite'] . "<br>";
                 echo "Specifications: " . $product_details['specifications'] . "<br>";
-            } 
-            
-            elseif ($product['type'] == 'composant') {
+            } elseif ($product['type'] == 'composant') {
                 echo "Marque: " . $product_details['marque'] . "<br>";
                 echo "Type du Composant : " . $product_details['type_composant'] . "<br>";
                 echo "Specifications: " . $product_details['specifications'] . "<br>";
@@ -134,7 +163,6 @@ if (isset($_GET['id'])) {
             }
             ?>
         </div>
-
     </div>
     <?php include '../reusables/footer.php'; ?>
 </body>
