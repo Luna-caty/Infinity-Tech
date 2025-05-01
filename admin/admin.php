@@ -1,12 +1,13 @@
 <?php
-require_once '../register/database.php';
-
-if (isset($_POST['delete_product']) && isset($_POST['product_id'])) {
-    $product_id = $_POST['product_id'];
-    $delete_query = "DELETE FROM products WHERE id_product = '" . $product_id . "'";
-    $delete_result = mysqli_query($connection, $delete_query);
+session_start();
+if (isset($_SESSION['user_id'])) {
+    require_once '../register/database.php';
+    if (isset($_POST['delete_product']) && isset($_POST['product_id'])) {
+        $product_id = $_POST['product_id'];
+        $delete_query = "DELETE FROM products WHERE id_product = '" . $product_id . "'";
+        $delete_result = mysqli_query($connection, $delete_query);
+    }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +21,24 @@ if (isset($_POST['delete_product']) && isset($_POST['product_id'])) {
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin.css">
     <link rel="icon" href="../assets/icon2.png" type="image/png">
-
+    <style>
+        .logout-link {
+            display: inline-block;
+            background-color: #124e8b;
+            color: white !important;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        .logout-link:hover {
+            background-color: #0d3b6a;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 
 <body>
@@ -34,13 +52,23 @@ if (isset($_POST['delete_product']) && isset($_POST['product_id'])) {
                 <li><a href="../admin/admin.php">View Products</a></li>
                 <li><a href="../admin/admin_insert_product.php">Insert Product</a></li>
             </ul>
-            <!-- <div class="nav_actions">
-                <img src="../assets/cart.png" alt="cart" class="cart-icon">
-                <a href="../register/signUp.php" class="register-btn">Register</a>
-            </div> -->
+           
+            <?php if (isset($_SESSION['user_id'])): ?>
+                    <div class="user-dropdown">
+                        <div class="dropdown-content">
+                            <a href="../register/logout.php" class="logout-link">Logout</a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <a href="../register/login.php">Login</a>
+                <?php endif; ?>
         </div>
     </nav>
-    <p id="welcomeP"> Welcome To <span>Admin Panel</span>
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <p id="welcomeP"> Welcome <span><?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+    <?php else: ?>
+        <p id="welcomeP"> Welcome To <span>Admin Panel</span>
+    <?php endif; ?>
     </p>
     <div class="product-table">
         <table class="admin-table">
@@ -82,4 +110,4 @@ if (isset($_POST['delete_product']) && isset($_POST['product_id'])) {
 </body>
 
 
-</html
+</html>

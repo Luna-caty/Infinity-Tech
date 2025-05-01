@@ -1,12 +1,6 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo "<h1>DEBUG : formulaire envoyé</h1>";
-}
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 require_once '../register/database.php'; // Assure-toi que $connection est bien défini dedans
-
+session_start();
 if (isset($_POST['add-product'])) {
     echo 'Soumission reçue<br>';
 

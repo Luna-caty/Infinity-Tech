@@ -206,7 +206,6 @@ body {
   margin-bottom: 20px;
 }
 
-/* Certains champs prennent toute la largeur */
 .form-group:nth-child(3),
 .form-group:nth-child(4),
 .form-group:nth-child(5),
@@ -333,4 +332,27 @@ button:hover {
   font-size: 20px;
   color: #064670;
   margin-top: 5px;
+}
+.logout-link {
+  display: inline-block;
+  background-color: #124e8b;
+  color: white !important;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-left: 20px; 
+  font-family: "Poppins", sans-serif;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logout-link:hover {
+  background-color: #0d3b6a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.navbar {
+  justify-content: space-between; 
 }

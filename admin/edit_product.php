@@ -1,6 +1,6 @@
 <?php
 require_once '../register/database.php';
-
+session_start();
 // Vérifier si l'ID est valide
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID de produit manquant");
