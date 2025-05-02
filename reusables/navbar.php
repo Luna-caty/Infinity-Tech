@@ -1,3 +1,29 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Vérifier si l'utilisateur est connecté et si le panier est vide
+$cart_link = "../cart/emptyCart.php"; // Lien par défaut
+
+if (isset($_SESSION['user_id'])) {
+    require_once '../register/database.php';
+
+    $user_id = $_SESSION['user_id'];
+    $query = "SELECT COUNT(*) as count FROM cart WHERE user_id = $user_id";
+    $result = mysqli_query($connection, $query);
+
+    if ($result && $row = mysqli_fetch_assoc($result)) {
+        if ($row['count'] > 0) {
+            $cart_link = "../cart/cart.php";
+        }
+    }
+    mysqli_close($connection);
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,9 +33,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="navbar.css">
     <style>
-    .navbar {
+        .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -76,6 +101,50 @@
         .register-btn:hover {
             opacity: 0.8;
         }
+
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .welcome-message {
+            color: #124e8b;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .welcome-message:hover {
+            opacity: 0.8;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 4px;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .user-dropdown:hover .dropdown-content {
+            display: block;
+        }
     </style>
 </head>
 
@@ -85,7 +154,6 @@
             <div class="logo">
                 <img src="../assets/logo.png" alt="logo">
                 <span>Infinity-Tech</span>
-
             </div>
             <ul class="nav-menu">
                 <li><a href="../home/home.php">Home</a></li>
@@ -94,12 +162,23 @@
                 <li><a href="laptops.php">Laptops</a></li>
             </ul>
             <div class="nav_actions">
-                <img src="../assets/cart.png" alt="cart" class="cart-icon">
-                <a href="../register/signUp.php" class="register-btn">Register</a>
+                <a href="<?php echo $cart_link; ?>" style="text-decoration: none;">
+                    <img src="../assets/cart.png" alt="cart" class="cart-icon">
+                </a>
+
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <div class="user-dropdown">
+                        <span class="welcome-message">Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+                        <div class="dropdown-content">
+                            <a href="../register/logout.php">Logout</a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <a href="../register/signUp.php" class="register-btn">Register</a>
+                <?php endif; ?>
             </div>
         </div>
     </nav>
-
 </body>
 
 </html>

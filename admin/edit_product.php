@@ -1,13 +1,20 @@
 <?php
 require_once '../register/database.php';
 session_start();
-// Vérifier si l'ID est valide
+
+// 🔐 Vérifier si l'utilisateur est connecté et est un administrateur
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+    header("Location: ../home/home.php");
+    exit();
+}
+
+// ✅ Vérifier si l'ID est valide
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID de produit manquant");
 }
 $product_id = intval($_GET['id']);
 
-// Récupérer les données du produit
+// ✅ Récupérer les données du produit
 $query = "SELECT * FROM products WHERE id_product = $product_id";
 $result = mysqli_query($connection, $query);
 $product = mysqli_fetch_assoc($result);
@@ -16,29 +23,30 @@ if (!$product) {
     die("Produit introuvable");
 }
 
-// Vérifier si le formulaire a été soumis
+// ✅ Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['name'], $_POST['price'], $_POST['category'])) {
         $name = mysqli_real_escape_string($connection, $_POST['name']);
         $price = floatval($_POST['price']);
         $category = mysqli_real_escape_string($connection, $_POST['category']);
-        $image = $product['image_principale']; // Conserver l'ancienne image par défaut
+        $image = $product['image_principale']; // Garder l'ancienne image par défaut
 
-        // Vérifier si une nouvelle image a été téléchargée
+        // ✅ Nouvelle image ?
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $image_tmp_name = $_FILES['image']['tmp_name'];
             $image_name = basename($_FILES['image']['name']);
             $upload_dir = '../assets/';
 
-            // Déplacer l'image téléchargée vers le répertoire cible
             if (move_uploaded_file($image_tmp_name, $upload_dir . $image_name)) {
-            $image = $upload_dir . $image_name; // Mettre à jour le chemin de l'image
+                $image = $image_name; // Juste le nom, car tu ajoutes ../assets/ dans le HTML
             } else {
-            echo "Erreur lors du téléchargement de l'image.";
+                echo "Erreur lors du téléchargement de l'image.";
             }
         }
 
-        $update_query = "UPDATE products SET name='$name', prix='$price', type='$category', image_principale='$image' WHERE id_product=$product_id";
+        $update_query = "UPDATE products 
+                         SET name='$name', prix='$price', type='$category', image_principale='$image' 
+                         WHERE id_product=$product_id";
 
         if (mysqli_query($connection, $update_query)) {
             header("Location: admin.php");
@@ -48,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
 ?>
 
 <!DOCTYPE html>

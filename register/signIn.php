@@ -1,41 +1,39 @@
 <?php
 session_start();
 require_once 'database.php';
+
 if (isset($_POST["signin"])) {
-    // store the data entred by the user in the variables
     $email = $_POST['email'];
     $password = $_POST['password'];
     $select = "SELECT * FROM users WHERE email='$email'";
     $result = mysqli_query($connection, $select);
     $error = [];
-    /*mysqli_num_rows($result) == 1 veut dire que l'email existe dans la bdd et que la requete a retourner une seule ligne 
-    $user = mysqli_fetch_assoc($result); ==> c'est pour recuperer les donnees de la ligne retourner par la requete sous forme de tableau associatif
-    apres c'est juste de verifications 
-    */
-    if(mysqli_num_rows($result) == 1){
+
+    if (mysqli_num_rows($result) == 1) {
         $user = mysqli_fetch_assoc($result);
-        if($password == $user['password']){
-        
-        if($user['role']=='admin')
-        {
-            header("Location: ../admin/admin.php");
-        }
-        else{
-            header("Location: ../home/home.php");
-        }
-        exit();
-        }
-        else{
+
+        // Vérifie le mot de passe
+        if ($password == $user['password']) { // idéalement utiliser password_verify()
+
+            // ✅ Sauvegarder l'ID de l'utilisateur dans la session
+            $_SESSION['user_id'] = $user['id_user'];
+            $_SESSION['user_name'] = $user['first_name']; // utile pour l'affichage
+
+            if ($user['role'] == 'admin') {
+                header("Location: ../admin/admin.php");
+            } else {
+                header("Location: ../home/home.php");
+            }
+            exit();
+        } else {
             $error[] = 'Password is incorrect';
         }
-        
-    }
-    else{
+    } else {
         $error[] = 'Email does not exist';
     }
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -47,6 +45,7 @@ if (isset($_POST["signin"])) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="register.css">
+    <link rel="icon" href="../assets/icon2.png" type="image/png">
 </head>
 
 <body>

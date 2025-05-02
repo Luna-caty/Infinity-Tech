@@ -11,11 +11,11 @@ if (!isset($_SESSION['user_id'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['product_id'])) {
     $user_id = $_SESSION['user_id'];
     $product_id = intval($_POST['product_id']);
-    
+
     // Vérifier si le produit existe déjà dans le panier
     $check_query = "SELECT * FROM cart WHERE user_id = $user_id AND product_id = $product_id";
     $check_result = mysqli_query($connection, $check_query);
-    
+
     if (mysqli_num_rows($check_result) > 0) {
         // Produit existe déjà, incrémenter la quantité
         $update_query = "UPDATE cart SET quantity = quantity + 1 WHERE user_id = $user_id AND product_id = $product_id";
@@ -25,12 +25,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['product_id'])) {
         $insert_query = "INSERT INTO cart (user_id, product_id, quantity) VALUES ($user_id, $product_id, 1)";
         mysqli_query($connection, $insert_query);
     }
-    
-    // Rediriger vers la page du panier
-    header("Location: ../cart/cart.php");
+
+    // Stocker un message de confirmation dans la session
+    $_SESSION['cart_message'] = "Produit ajouté au panier!";
+
+    // Recharger la page sans redirection
+    header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $product_id);
     exit();
 }
-
 // Récupération des détails du produit
 if (isset($_GET['id'])) {
     $product_id = intval($_GET['id']);
@@ -56,7 +58,7 @@ if (isset($_GET['id'])) {
                 $select_query = null;
                 break;
         }
-        
+
         if ($select_query) {
             $select_query = mysqli_query($connection, $select_query);
             if ($select_query && mysqli_num_rows($select_query) > 0) {

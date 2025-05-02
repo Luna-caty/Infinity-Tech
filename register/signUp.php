@@ -22,6 +22,7 @@ if (isset($_POST["registerButton"])) {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,6 +34,8 @@ if (isset($_POST["registerButton"])) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="register.css">
+    <link rel="icon" href="../assets/icon2.png" type="image/png">
+
 </head>
 
 <body>
@@ -64,7 +67,7 @@ if (isset($_POST["registerButton"])) {
                 <select name="role" id="role" required>
                     <option value="" disabled selected style="font-family: 'Poppins';">Select your Role</option>
                     <option value="admin">Admin</option>
-                    <option value="user">User</option>
+                    <option value="client">Client</option>
                 </select>
             <br>
 
