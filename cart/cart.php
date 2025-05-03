@@ -3,7 +3,7 @@ require_once '../register/database.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../register/login.php");
+    header("Location: ../register/SignIn.php");
     exit;
 }
 
@@ -16,23 +16,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         switch ($action) {
             case 'add':
-                $check_stmt = mysqli_prepare($connection, "SELECT * FROM cart WHERE user_id = ? AND product_id = ?");
-                mysqli_stmt_bind_param($check_stmt, "ii", $user_id, $product_id);
-                mysqli_stmt_execute($check_stmt);
-                mysqli_stmt_store_result($check_stmt);
+                $check_query = "SELECT * FROM cart WHERE user_id = $user_id AND product_id = $product_id";
+                $check_result = mysqli_query($connection, $check_query);
 
-                if (mysqli_stmt_num_rows($check_stmt) > 0) {
-                    mysqli_stmt_close($check_stmt);
-                    $update_stmt = mysqli_prepare($connection, "UPDATE cart SET quantity = quantity + 1 WHERE user_id = ? AND product_id = ?");
-                    mysqli_stmt_bind_param($update_stmt, "ii", $user_id, $product_id);
-                    mysqli_stmt_execute($update_stmt);
-                    mysqli_stmt_close($update_stmt);
+                if (mysqli_num_rows($check_result) > 0) {
+                    $update_query = "UPDATE cart SET quantity = quantity + 1 WHERE user_id = $user_id AND product_id = $product_id";
+                    mysqli_query($connection, $update_query);
                 } else {
-                    mysqli_stmt_close($check_stmt);
-                    $insert_stmt = mysqli_prepare($connection, "INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, 1)");
-                    mysqli_stmt_bind_param($insert_stmt, "ii", $user_id, $product_id);
-                    mysqli_stmt_execute($insert_stmt);
-                    mysqli_stmt_close($insert_stmt);
+                    $insert_query = "INSERT INTO cart (user_id, product_id, quantity) VALUES ($user_id, $product_id, 1)";
+                    mysqli_query($connection, $insert_query);
                 }
                 break;
 
@@ -40,106 +32,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if (isset($_POST['quantity'])) {
                     $quantity = intval($_POST['quantity']);
                     if ($quantity > 0 && $quantity <= 10) {
-                        $update_stmt = mysqli_prepare($connection, "UPDATE cart SET quantity = ? WHERE user_id = ? AND product_id = ?");
-                        mysqli_stmt_bind_param($update_stmt, "iii", $quantity, $user_id, $product_id);
-                        mysqli_stmt_execute($update_stmt);
-                        mysqli_stmt_close($update_stmt);
+                        $update_query = "UPDATE cart SET quantity = $quantity WHERE user_id = $user_id AND product_id = $product_id";
+                        mysqli_query($connection, $update_query);
                     }
                 }
                 break;
 
             case 'remove':
-                $delete_stmt = mysqli_prepare($connection, "DELETE FROM cart WHERE user_id = ? AND product_id = ?");
-                mysqli_stmt_bind_param($delete_stmt, "ii", $user_id, $product_id);
-                mysqli_stmt_execute($delete_stmt);
-                mysqli_stmt_close($delete_stmt);
+                $delete_query = "DELETE FROM cart WHERE user_id = $user_id AND product_id = $product_id";
+                mysqli_query($connection, $delete_query);
                 break;
-
-                case 'place_order':
-                    $cart_stmt = mysqli_prepare($connection, "SELECT product_id, quantity FROM cart WHERE user_id = ?");
-                    mysqli_stmt_bind_param($cart_stmt, "i", $user_id);
-                    mysqli_stmt_execute($cart_stmt);
-                    $cart_result = mysqli_stmt_get_result($cart_stmt);
-                
-                    if (mysqli_num_rows($cart_result) > 0) {
-                        // Insère une commande vide
-                        $insert_order_stmt = mysqli_prepare(
-                            $connection,
-                            "INSERT INTO orders (user_id, date_commande, total)
-                             VALUES (?, NOW(), 0)"
-                        );
-                        mysqli_stmt_bind_param($insert_order_stmt, "i", $user_id);
-                        mysqli_stmt_execute($insert_order_stmt);
-                        mysqli_stmt_close($insert_order_stmt);
-                
-                        $order_id = mysqli_insert_id($connection);
-                        $total = 0;
-                
-                        while ($row = mysqli_fetch_assoc($cart_result)) {
-                            $product_id = $row['product_id'];
-                            $quantity = $row['quantity'];
-                
-                            $price_stmt = mysqli_prepare($connection, "SELECT prix FROM products WHERE id_product = ?");
-                            mysqli_stmt_bind_param($price_stmt, "i", $product_id);
-                            mysqli_stmt_execute($price_stmt);
-                            $price_result = mysqli_stmt_get_result($price_stmt);
-                            $price_row = mysqli_fetch_assoc($price_result);
-                            $unit_price = $price_row['prix'];
-                            mysqli_stmt_close($price_stmt);
-                
-                            $subtotal = $quantity * $unit_price;
-                            $total += $subtotal;
-                
-                            $insert_item_stmt = mysqli_prepare(
-                                $connection,
-                                "INSERT INTO order_items (order_id, product_id, quantity, prix_unitaire)
-                                 VALUES (?, ?, ?, ?)"
-                            );
-                            mysqli_stmt_bind_param($insert_item_stmt, "iiid", $order_id, $product_id, $quantity, $unit_price);
-                            mysqli_stmt_execute($insert_item_stmt);
-                            mysqli_stmt_close($insert_item_stmt);
-                        }
-                
-                        $update_total_stmt = mysqli_prepare($connection, "UPDATE orders SET total = ? WHERE id_order = ?");
-                        mysqli_stmt_bind_param($update_total_stmt, "di", $total, $order_id);
-                        mysqli_stmt_execute($update_total_stmt);
-                        mysqli_stmt_close($update_total_stmt);
-                
-                        $delete_cart_stmt = mysqli_prepare($connection, "DELETE FROM cart WHERE user_id = ?");
-                        mysqli_stmt_bind_param($delete_cart_stmt, "i", $user_id);
-                        mysqli_stmt_execute($delete_cart_stmt);
-                        mysqli_stmt_close($delete_cart_stmt);
-                
-                        // Version sûre et propre de la redirection
-                        $redirect_url = "orderDetail/orderDetail.php?id=" . $order_id;
-                        echo "<script>window.location.href = '" . $redirect_url . "';</script>";
-                        // En cas où JavaScript est désactivé
-                        echo "<meta http-equiv='refresh' content='0;url=" . $redirect_url . "'>";
-                        // Redirection PHP comme fallback
-                        header("Location: " . $redirect_url);
-                        exit;
-                    } else {
-                        echo "Votre panier est vide.";
-                    }
-            mysqli_stmt_close($cart_stmt);
-            break;
         }
+
         header("Location: cart.php");
         exit();
     }
 }
 
-$query_stmt = mysqli_prepare(
-    $connection,
-    "SELECT p.id_product, p.name, p.prix, p.image_principale, c.quantity 
-     FROM cart c
-     JOIN products p ON c.product_id = p.id_product
-     WHERE c.user_id = ?"
-);
-mysqli_stmt_bind_param($query_stmt, "i", $user_id);
-mysqli_stmt_execute($query_stmt);
-$result = mysqli_stmt_get_result($query_stmt);
-mysqli_stmt_close($query_stmt);
+$query = "SELECT p.id_product, p.name, p.prix, p.image_principale, c.quantity 
+          FROM cart c
+          JOIN products p ON c.product_id = p.id_product
+          WHERE c.user_id = $user_id";
+$result = mysqli_query($connection, $query);
 
 if (mysqli_num_rows($result) === 0) {
     header("Location: emptyCart.php");
@@ -160,27 +74,15 @@ while ($item = mysqli_fetch_assoc($result)) {
 }
 
 $total_formatted = number_format($total, 2);
-
-$last_order_stmt = mysqli_prepare($connection, "SELECT id_order FROM orders WHERE user_id = ? ORDER BY date_commande DESC LIMIT 1");
-mysqli_stmt_bind_param($last_order_stmt, "i", $user_id);
-mysqli_stmt_execute($last_order_stmt);
-$last_order_result = mysqli_stmt_get_result($last_order_stmt);
-mysqli_stmt_close($last_order_stmt);
-
-$last_order_id = null;
-if ($last_order_result && mysqli_num_rows($last_order_result) > 0) {
-    $row = mysqli_fetch_assoc($last_order_result);
-    $last_order_id = $row['id_order'];
-}
 ?>
 
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panier - Infinity-Tech</title>
+    <title>Shopping Cart</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -203,12 +105,16 @@ if ($last_order_result && mysqli_num_rows($last_order_result) > 0) {
                                 <div class="item-title"><?php echo htmlspecialchars($item['name']); ?></div>
                                 <div class="item-price"><?php echo htmlspecialchars($item['prix_formatted']) . "€"; ?></div>
                                 <div class="quantity-selector">
-                                    <form method="post" action="cart.php" style="display: inline-flex; align-items: center;">
+                                    <form method="post" action="cart.php" style="display: inline;">
                                         <input type="hidden" name="product_id" value="<?php echo $item['id_product']; ?>">
                                         <input type="hidden" name="action" value="update">
-                                        <button type="button" class="quantity-btn minus" onclick="this.form.quantity.value=Math.max(1, parseInt(this.form.quantity.value)-1); this.form.submit()">-</button>
-                                        <input type="number" name="quantity" value="<?php echo $item['quantity']; ?>" min="1" max="10" style="width: 40px; text-align: center;" readonly>
-                                        <button type="button" class="quantity-btn plus" onclick="this.form.quantity.value=Math.min(10, parseInt(this.form.quantity.value)+1); this.form.submit()">+</button>
+                                        <select name="quantity" onchange="this.form.submit()">
+                                            <?php for ($i = 1; $i <= 10; $i++): ?>
+                                                <option value="<?php echo $i; ?>" <?php if ($i == $item['quantity']) echo 'selected'; ?>>
+                                                    <?php echo $i; ?>
+                                                </option>
+                                            <?php endfor; ?>
+                                        </select>
                                     </form>
                                     <form method="post" action="cart.php" style="display: inline;">
                                         <input type="hidden" name="product_id" value="<?php echo $item['id_product']; ?>">
@@ -221,24 +127,8 @@ if ($last_order_result && mysqli_num_rows($last_order_result) > 0) {
                     <?php endforeach; ?>
                 </div>
                 <div class="cart-summary">
-                    <div class="summary-box">
-                        <div class="summary-title">Summary</div>
-                        <div class="summary-row summary-total">
-                            <span>Total</span>
-                            <span><?php echo $total_formatted; ?>€</span>
-                        </div>
-                        <div class="shipping-note">(Excluding Delivery)</div>
-                    </div>
-                    <div class="checkout-actions">
-                        <?php if ($last_order_id): ?>
-                            <a href="../orderDetail/orderDetail.php echo $last_order_id; ?>" class="checkout-btn">Voir détail commande</a>
-                        <?php else: ?>
-                            <form method="post" action="cart.php">
-                                <input type="hidden" name="action" value="place_order">
-                                <input type="hidden" name="product_id" value="0"> <!-- Ajout de cette ligne -->
-                                <button type="submit" class="checkout-btn">Passer la commande</button>
-                            </form>
-                        <?php endif; ?>
+                    <div class="validate-order">
+                        <a href="../order/order_details.php" class="validate-btn">Valider Commande</a>
                     </div>
                 </div>
             <?php else: ?>

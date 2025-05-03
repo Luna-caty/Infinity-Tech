@@ -182,22 +182,21 @@ input[name="quantity"] {
   border-right: none;
   padding: 5px;
 }
-.checkout-actions {
-  margin-top: 2rem;
-  text-align: right;
-}
-
-.checkout-btn {
+.validate-btn {
+  display: inline-block;
   background-color: #4caf50;
   color: white;
-  border: none;
   padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
   font-size: 16px;
-  cursor: pointer;
   border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
   transition: background-color 0.3s;
 }
 
-.checkout-btn:hover {
+.validate-btn:hover {
   background-color: #45a049;
 }
