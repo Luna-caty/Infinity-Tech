@@ -128,60 +128,163 @@ CREATE TABLE
         UNIQUE KEY unique_cart_item (user_id, product_id)
     );
 
--- une table pour stocker plusieurs images
-CREATE TABLE
-    Images (
-        id_image INT PRIMARY KEY AUTO_INCREMENT,
-        id_produit INT NOT NULL,
-        type_produit ENUM ('laptop', 'smartphone', 'accessoire') NOT NULL,
-        url_image VARCHAR(255) NOT NULL
-    );
+-- procedure 1 
+DELIMITER / / CREATE PROCEDURE GetOrderDetails (IN p_user_id INT) BEGIN
+-- Declare variables
+DECLARE v_total DECIMAL(10, 2) DEFAULT 0;
 
--- Orders table  Stocker les informations globales de chaque commande passée.
+-- Select all items in the cart with their details
+SELECT
+    p.id_product,
+    p.name,
+    p.prix,
+    c.quantity,
+    (p.prix * c.quantity) AS subtotal
+FROM
+    cart c
+    JOIN products p ON c.product_id = p.id_product
+WHERE
+    c.user_id = p_user_id;
+
+-- Calculate and display the total
+SELECT
+    SUM(p.prix * c.quantity) AS total_amount
+FROM
+    cart c
+    JOIN products p ON c.product_id = p.id_product
+WHERE
+    c.user_id = p_user_id;
+
+END / / DELIMITER;
+
+-- Créer la table des commandes
 CREATE TABLE
     Orders (
         id_order INT PRIMARY KEY AUTO_INCREMENT,
         user_id INT NOT NULL,
-        date_commande DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        total DECIMAL(10, 2) NOT NULL,
+        order_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        total_amount DECIMAL(10, 2) NOT NULL,
+        status ENUM (
+            'en_attente',
+            'confirmée',
+            'expédiée',
+            'livrée',
+            'annulée'
+        ) NOT NULL DEFAULT 'en_attente',
         FOREIGN KEY (user_id) REFERENCES Users (id_user) ON DELETE CASCADE
     );
 
--- Order Items table Stocker la liste des produits pour chaque commande.
+-- Créer la table des items de commande
 CREATE TABLE
-    Order_Items (
-        id_item INT PRIMARY KEY AUTO_INCREMENT,
+    OrderItems (
+        id_order_item INT PRIMARY KEY AUTO_INCREMENT,
         order_id INT NOT NULL,
         product_id INT NOT NULL,
         quantity INT NOT NULL,
-        prix_unitaire DECIMAL(10, 2) NOT NULL,
+        price_per_unit DECIMAL(10, 2) NOT NULL,
+        subtotal DECIMAL(10, 2) NOT NULL,
         FOREIGN KEY (order_id) REFERENCES Orders (id_order) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES Products (id_product) ON DELETE CASCADE
+        FOREIGN KEY (product_id) REFERENCES Products (id_product)
     );
 
-DELIMITER / / CREATE PROCEDURE GetOrderDetails (IN p_order_id INT, IN p_user_id INT) BEGIN DECLARE total_amount DECIMAL(10, 2);
+DELIMITER / / CREATE PROCEDURE FinalizeOrder (IN p_user_id INT, OUT p_order_id INT) BEGIN DECLARE v_total DECIMAL(10, 2) DEFAULT 0;
 
--- Vérifier que la commande appartient à l'utilisateur
-IF NOT EXISTS (
-    SELECT
-        1
-    FROM
-        Orders
-    WHERE
-        id_order = p_order_id
-        AND user_id = p_user_id
-) THEN SIGNAL SQLSTATE '45000'
+-- Calcul du total de la commande
+SELECT
+    SUM(p.prix * c.quantity) INTO v_total
+FROM
+    cart c
+    JOIN products p ON c.product_id = p.id_product
+WHERE
+    c.user_id = p_user_id;
+
+-- Vérifier si le panier n'est pas vide
+IF v_total > 0 THEN
+-- Insérer la commande
+INSERT INTO
+    Orders (user_id, total_amount)
+VALUES
+    (p_user_id, v_total);
+
+-- Récupérer l'ID de la commande créée
 SET
-    MESSAGE_TEXT = "Cette commande n\'appartient pas à cet utilisateur";
+    p_order_id = LAST_INSERT_ID ();
+
+-- Insérer les items de la commande
+INSERT INTO
+    OrderItems (
+        order_id,
+        product_id,
+        quantity,
+        price_per_unit,
+        subtotal
+    )
+SELECT
+    p_order_id,
+    p.id_product,
+    c.quantity,
+    p.prix,
+    (p.prix * c.quantity)
+FROM
+    cart c
+    JOIN products p ON c.product_id = p.id_product
+WHERE
+    c.user_id = p_user_id;
+
+-- Mettre à jour le stock (si besoin)
+UPDATE Products p
+JOIN cart c ON p.id_product = c.product_id
+SET
+    p.quantite_stock = p.quantite_stock - c.quantity
+WHERE
+    c.user_id = p_user_id;
+
+-- Vider le panier
+DELETE FROM cart
+WHERE
+    user_id = p_user_id;
+
+ELSE
+-- Si le panier est vide, retourner 0 comme ID de commande
+SET
+    p_order_id = 0;
 
 END IF;
 
--- Détails de la commande
+END / / DELIMITER;
+
+DELIMITER / / CREATE PROCEDURE GetCustomerOrderHistory (IN customer_id INT) BEGIN
+-- Sélectionner toutes les commandes du client
 SELECT
     o.id_order,
-    o.date_commande,
-    o.statut,
-    o.adresse_livraison,
+    o.order_date,
+    o.status,
+    o.total_amount,
+    (
+        SELECT
+            COUNT(*)
+        FROM
+            OrderItems
+        WHERE
+            order_id = o.id_order
+    ) AS items_count
+FROM
+    Orders o
+WHERE
+    o.user_id = customer_id
+ORDER BY
+    o.order_date DESC;
+
+END / / DELIMITER;
+
+DELIMITER / / CREATE PROCEDURE GetCompletedOrderDetails (IN order_id INT) BEGIN
+-- Informations générales de la commande
+SELECT
+    o.id_order,
+    o.user_id,
+    o.order_date,
+    o.status,
+    o.total_amount,
     u.first_name,
     u.last_name,
     u.email
@@ -189,28 +292,20 @@ FROM
     Orders o
     JOIN Users u ON o.user_id = u.id_user
 WHERE
-    o.id_order = p_order_id;
+    o.id_order = order_id;
 
--- Articles de la commande avec détails produits
+-- Détails des articles de la commande
 SELECT
     oi.product_id,
     p.name,
-    p.type,
+    p.image_principale,
     oi.quantity,
-    oi.prix_unitaire,
-    (oi.quantity * oi.prix_unitaire) AS sous_total
+    oi.price_per_unit,
+    oi.subtotal
 FROM
-    Order_Items oi
+    OrderItems oi
     JOIN Products p ON oi.product_id = p.id_product
 WHERE
-    oi.order_id = p_order_id;
-
--- Total de la commande
-SELECT
-    total
-FROM
-    Orders
-WHERE
-    id_order = p_order_id;
+    oi.order_id = order_id;
 
 END / / DELIMITER;
