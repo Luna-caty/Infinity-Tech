@@ -7,7 +7,6 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['
 
 require_once '../register/database.php';
 
-// ✅ Traitement de la suppression de produit
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product'], $_POST['product_id'])) {
     $product_id = intval($_POST['product_id']); // Sécuriser l’ID
 
@@ -29,24 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product'], $_P
     <title>Infinity-Tech</title>
     <link rel="stylesheet" href="admin.css">
     <link rel="icon" href="../assets/icon2.png" type="image/png">
-    <style>
-        .logout-link {
-            display: inline-block;
-            background-color: #124e8b;
-            color: white !important;
-            padding: 8px 15px;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            text-align: center;
-            margin-top: 5px;
-        }
-
-        .logout-link:hover {
-            background-color: #0d3b6a;
-            transform: translateY(-2px);
-            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
-        }
-    </style>
 </head>
 
 <body>
@@ -90,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product'], $_P
                     <th>Name</th>
                     <th>Price</th>
                     <th>Category</th>
+                    <th>Quantity</th>
                     <th>Image</th>
                     <th>Actions</th>
                 </tr>
@@ -105,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product'], $_P
                     echo '<td data-label="Name">' . htmlspecialchars($row['name']) . '</td>';
                     echo '<td data-label="Price" class="price-column">' . number_format($row['prix'], 2, ',', ' ') . '€</td>';
                     echo '<td data-label="Category">' . htmlspecialchars($row['type']) . '</td>';
+                    echo '<td data-label="Quantity">' . htmlspecialchars($row['quantity']) . '</td>';
                     echo '<td data-label="Image"><img src="../assets/' . htmlspecialchars($row['image_principale']) . '" alt="' . htmlspecialchars($row['name']) . '" class="product-image"></td>';
                     echo '<td data-label="Actions">
                             <a href="../productDetail/product_detail.php?id=' . htmlspecialchars($row['id_product']) . '" class="see-more-btn">View</a>

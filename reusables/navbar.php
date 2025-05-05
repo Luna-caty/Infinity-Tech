@@ -2,27 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+require_once '../register/database.php';
 
-// Vérifier si l'utilisateur est connecté et si le panier est vide
-$cart_link = "../cart/emptyCart.php"; // Lien par défaut
-
-if (isset($_SESSION['user_id'])) {
-    require_once '../register/database.php';
-
-    $user_id = $_SESSION['user_id'];
-    $query = "SELECT COUNT(*) as count FROM cart WHERE user_id = $user_id";
-    $result = mysqli_query($connection, $query);
-
-    if ($result && $row = mysqli_fetch_assoc($result)) {
-        if ($row['count'] > 0) {
-            $cart_link = "../cart/cart.php";
-        }
-    }
-    mysqli_close($connection);
-}
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -160,9 +142,10 @@ if (isset($_SESSION['user_id'])) {
                 <li><a href="../shop/shop.php">Shop</a></li>
                 <li><a href="accessoires.php">Accessoires</a></li>
                 <li><a href="laptops.php">Laptops</a></li>
+                <li> <a href="../order/order_history.php">Mes Commandes</a></li>
             </ul>
             <div class="nav_actions">
-                <a href="<?php echo $cart_link; ?>" style="text-decoration: none;">
+                <a href="../cart/cart.php" style="text-decoration: none;">
                     <img src="../assets/cart.png" alt="cart" class="cart-icon">
                 </a>
 

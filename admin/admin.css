@@ -322,13 +322,11 @@ button:hover {
   align-items: center;
   gap: 6px;
 }
-.product-details-form
-{
+.product-details-form {
   display: flex;
   flex-direction: column;
 }
-#more-detail-text
-{
+#more-detail-text {
   font-size: 20px;
   color: #064670;
   margin-top: 5px;
@@ -342,17 +340,33 @@ button:hover {
   text-decoration: none;
   font-weight: 500;
   transition: all 0.3s ease;
-  margin-left: 20px; 
+  margin-left: 20px;
   font-family: "Poppins", sans-serif;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .logout-link:hover {
   background-color: #0d3b6a;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .navbar {
-  justify-content: space-between; 
+  justify-content: space-between;
+}
+.logout-link {
+  display: inline-block;
+  background-color: #124e8b;
+  color: white !important;
+  padding: 8px 15px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.logout-link:hover {
+  background-color: #0d3b6a;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
 }
