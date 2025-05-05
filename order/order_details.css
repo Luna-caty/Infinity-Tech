@@ -107,3 +107,11 @@ h2 {
 .confirm-btn:hover {
   background-color: #45a049;
 }
+.error-message {
+  background-color: #ffebee;
+  color: #b71c1c;
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 5px;
+  border-left: 4px solid #f44336;
+}

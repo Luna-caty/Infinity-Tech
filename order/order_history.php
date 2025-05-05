@@ -243,7 +243,7 @@ $has_orders = mysqli_num_rows($result) > 0;
             <div class="no-orders">
                 <p>Vous n'avez pas encore effectué de commande.</p>
                 <div class="no-orders-actions">
-                    <a href="../index.php" class="action-btn primary-btn">Explorer nos produits</a>
+                    <a href="../shop/shop.php" class="action-btn primary-btn">Explorer nos produits</a>
                 </div>
             </div>
         <?php endif; ?>

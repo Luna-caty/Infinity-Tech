@@ -314,11 +314,6 @@ $items_result = mysqli_stmt_get_result($items_stmt);
                 <div class="order-date">
                     <span>Date: <?php echo date('d/m/Y à H:i', strtotime($order['order_date'])); ?></span>
                 </div>
-                <div class="order-status">
-                    <span class="status-badge status-<?php echo strtolower($order['status']); ?>">
-                        <?php echo $order['status']; ?>
-                    </span>
-                </div>
             </div>
         </div>
 

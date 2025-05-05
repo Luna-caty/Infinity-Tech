@@ -13,19 +13,36 @@ $order_id = 0;
 
 // Traitement de la confirmation de commande
 if (isset($_POST['confirm_order'])) {
-    // Appel de la procédure stockée
-    $stmt = mysqli_prepare($connection, "CALL FinalizeOrder(?, @order_id)");
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
+    try {
+        // Appel de la procédure stockée
+        $stmt = mysqli_prepare($connection, "CALL FinalizeOrder(?, @order_id)");
+        mysqli_stmt_bind_param($stmt, "i", $user_id);
 
-    // Récupération de l'ID de commande généré
-    $result = mysqli_query($connection, "SELECT @order_id as order_id");
-    $row = mysqli_fetch_assoc($result);
-    $order_id = $row['order_id'];
+        if (!mysqli_stmt_execute($stmt)) {
+            // Vérifier si l'erreur concerne le stock
+            if (strpos(mysqli_error($connection), 'Stock insuffisant') !== false) {
+                $error_message = "Stock insuffisant pour certains produits de votre panier. Veuillez ajuster vos quantités.";
+            } else {
+                $error_message = "Une erreur est survenue lors de la finalisation de votre commande.";
+            }
+        } else {
+            mysqli_stmt_close($stmt);
 
-    if ($order_id > 0) {
-        $order_confirmed = true;
+            // Récupération de l'ID de commande généré
+            $result = mysqli_query($connection, "SELECT @order_id as order_id");
+            $row = mysqli_fetch_assoc($result);
+            $order_id = $row['order_id'];
+
+            if ($order_id > 0) {
+                // Redirection vers la page de confirmation
+                header("Location: order_confirmation.php?order_id=" . $order_id);
+                exit();
+            } else {
+                $error_message = "Votre panier est vide.";
+            }
+        }
+    } catch (Exception $e) {
+        $error_message = "Une erreur est survenue: " . $e->getMessage();
     }
 }
 
@@ -83,6 +100,11 @@ $user = mysqli_fetch_assoc($user_result);
             <h1>Détails de la commande</h1>
         </div>
 
+        <?php if (isset($error_message)): ?>
+            <div class="error-message">
+                <?php echo $error_message; ?>
+            </div>
+        <?php endif; ?>
         <div class="customer-info">
             <h2>Informations client</h2>
             <p><strong>Nom:</strong> <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></p>
