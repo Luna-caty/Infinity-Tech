@@ -29,6 +29,7 @@ if (isset($_POST['confirm_order'])) {
             mysqli_stmt_close($stmt);
 
             // Récupération de l'ID de commande généré
+            // Récupération de l'ID de commande généré
             $result = mysqli_query($connection, "SELECT @order_id as order_id");
             $row = mysqli_fetch_assoc($result);
             $order_id = $row['order_id'];
@@ -37,8 +38,12 @@ if (isset($_POST['confirm_order'])) {
                 // Redirection vers la page de confirmation
                 header("Location: order_confirmation.php?order_id=" . $order_id);
                 exit();
-            } else {
+            } else if ($order_id == 0) {
                 $error_message = "Votre panier est vide.";
+            } else if ($order_id == -1) {
+                $error_message = "Stock insuffisant pour certains produits de votre panier. Veuillez ajuster vos quantités.";
+            } else {
+                $error_message = "Une erreur est survenue lors de la finalisation de votre commande.";
             }
         }
     } catch (Exception $e) {
