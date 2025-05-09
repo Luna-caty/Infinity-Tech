@@ -1,3 +1,4 @@
+
 DELIMITER //
 
 CREATE TRIGGER update_product_stock 
@@ -13,7 +14,6 @@ BEGIN
     WHERE id_product = NEW.product_id;
     
     -- Mettre à jour le stock dans la table spécifique selon le type de produit
-    -- Noter que la mise à jour de la table Products est supprimée pour éviter la double mise à jour
     CASE product_type
         WHEN 'laptop' THEN
             UPDATE Laptops 
@@ -40,8 +40,6 @@ END //
 DELIMITER ;
 
 DELIMITER //
-
--- trigger 2 
 CREATE TRIGGER check_product_stock 
 BEFORE INSERT ON Orders
 FOR EACH ROW
@@ -67,6 +65,7 @@ DELIMITER ;
 -- solution pour la table orders 
 DELIMITER //
 
+DROP TRIGGER IF EXISTS check_stock_before_order //
 CREATE TRIGGER check_stock_before_order
 BEFORE INSERT ON Orders
 FOR EACH ROW
@@ -86,4 +85,48 @@ END //
 
 DELIMITER ;
 
+
+
 -- trigger 3
+DELIMITER //
+
+CREATE TRIGGER restore_stock_after_cancel
+AFTER UPDATE ON Orders
+FOR EACH ROW
+BEGIN
+    -- Vérifier si le statut est passé à "annulée"
+    IF NEW.status = 'annulée' AND OLD.status != 'annulée' THEN
+        -- Restaurer le stock dans la table Products
+        UPDATE Products p
+        JOIN OrderItems oi ON p.id_product = oi.product_id
+        SET p.quantity = p.quantity + oi.quantity
+        WHERE oi.order_id = NEW.id_order;
+        
+        -- Récupérer et mettre à jour le stock dans les tables spécifiques selon le type
+        UPDATE Laptops l
+        JOIN Products p ON l.id_product = p.id_product
+        JOIN OrderItems oi ON p.id_product = oi.product_id
+        SET l.quantity = l.quantity + oi.quantity
+        WHERE oi.order_id = NEW.id_order AND p.type = 'laptop';
+        
+        UPDATE Smartphones s
+        JOIN Products p ON s.id_product = p.id_product
+        JOIN OrderItems oi ON p.id_product = oi.product_id
+        SET s.quantity = s.quantity + oi.quantity
+        WHERE oi.order_id = NEW.id_order AND p.type = 'smartphone';
+        
+        UPDATE Accessoires a
+        JOIN Products p ON a.id_product = p.id_product
+        JOIN OrderItems oi ON p.id_product = oi.product_id
+        SET a.quantity = a.quantity + oi.quantity
+        WHERE oi.order_id = NEW.id_order AND p.type = 'accessoire';
+        
+        UPDATE Stockage_Composants sc
+        JOIN Products p ON sc.id_product = p.id_product
+        JOIN OrderItems oi ON p.id_product = oi.product_id
+        SET sc.quantity = sc.quantity + oi.quantity
+        WHERE oi.order_id = NEW.id_order AND p.type = 'composant';
+    END IF;
+END //
+
+DELIMITER ;
