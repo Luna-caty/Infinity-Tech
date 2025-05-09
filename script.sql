@@ -9,6 +9,15 @@ CREATE TABLE
     );
 
 CREATE TABLE
+    Products (
+        id_product INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(100) NOT NULL,
+        prix DECIMAL(10, 2) NOT NULL,
+        image_principale VARCHAR(255),
+        type ENUM ('laptop', 'smartphone', 'accessoire', 'composant') NOT NULL
+    );
+
+CREATE TABLE
     Laptops (
         id_pc INT PRIMARY KEY AUTO_INCREMENT,
         id_product INT UNIQUE,
@@ -106,15 +115,6 @@ CREATE TABLE
         quantite_stock INT NOT NULL DEFAULT 0,
         image_principale VARCHAR(255),
         FOREIGN KEY (id_product) REFERENCES Products (id_product) ON DELETE CASCADE
-    );
-
-CREATE TABLE
-    Products (
-        id_product INT PRIMARY KEY AUTO_INCREMENT,
-        name VARCHAR(100) NOT NULL,
-        prix DECIMAL(10, 2) NOT NULL,
-        image_principale VARCHAR(255),
-        type ENUM ('laptop', 'smartphone', 'accessoire', 'composant') NOT NULL
     );
 
 CREATE TABLE
