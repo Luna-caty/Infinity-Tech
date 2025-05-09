@@ -130,3 +130,40 @@ BEGIN
 END //
 
 DELIMITER ;
+-- trigger 4
+DELIMITER //
+
+CREATE TRIGGER log_cancelled_order
+AFTER UPDATE ON Orders
+FOR EACH ROW
+BEGIN
+    -- Vérifier si le statut est passé à "annulée"
+    IF NEW.status = 'annulée' AND OLD.status != 'annulée' THEN
+        -- Compter le nombre d'articles dans la commande
+        DECLARE items_count INT;
+        
+        SELECT COUNT(*) INTO items_count
+        FROM OrderItems
+        WHERE order_id = NEW.id_order;
+        
+        -- Insérer dans la table d'historique
+        INSERT INTO OrderCancellationHistory (
+            order_id,
+            user_id,
+            order_date,
+            total_amount,
+            previous_status,
+            items_count
+        )
+        VALUES (
+            NEW.id_order,
+            NEW.user_id,
+            NEW.order_date,
+            NEW.total_amount,
+            OLD.status,
+            items_count
+        );
+    END IF;
+END //
+
+DELIMITER ;

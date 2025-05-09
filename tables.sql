@@ -14,8 +14,7 @@ CREATE TABLE
         name VARCHAR(100) NOT NULL,
         prix DECIMAL(10, 2) NOT NULL,
         image_principale VARCHAR(255),
-        type ENUM ('laptop', 'smartphone', 'accessoire', 'composant') NOT NULL
-        quantity int
+        type ENUM ('laptop', 'smartphone', 'accessoire', 'composant') NOT NULL quantity int
     );
 
 CREATE TABLE
@@ -37,9 +36,7 @@ CREATE TABLE
         prix DECIMAL(10, 2) NOT NULL,
         quantite_stock INT NOT NULL DEFAULT 0,
         image_principale VARCHAR(255),
-        FOREIGN KEY (id_product) REFERENCES Products (id_product) ON DELETE CASCADE
-        quantity int
-
+        FOREIGN KEY (id_product) REFERENCES Products (id_product) ON DELETE CASCADE quantity int
     );
 
 CREATE TABLE
@@ -62,9 +59,7 @@ CREATE TABLE
         prix DECIMAL(10, 2) NOT NULL,
         quantite_stock INT NOT NULL DEFAULT 0,
         image_principale VARCHAR(255),
-        FOREIGN KEY (id_product) REFERENCES Products (id_product) ON DELETE CASCADE
-        quantity int
-
+        FOREIGN KEY (id_product) REFERENCES Products (id_product) ON DELETE CASCADE quantity int
     );
 
 CREATE TABLE
@@ -91,9 +86,7 @@ CREATE TABLE
         prix DECIMAL(10, 2) NOT NULL,
         quantite_stock INT NOT NULL DEFAULT 0,
         image_principale VARCHAR(255),
-        FOREIGN KEY (id_product) REFERENCES Products (id_product) ON DELETE CASCADE
-        quantity int
-
+        FOREIGN KEY (id_product) REFERENCES Products (id_product) ON DELETE CASCADE quantity int
     );
 
 CREATE TABLE
@@ -121,9 +114,7 @@ CREATE TABLE
         prix DECIMAL(10, 2) NOT NULL,
         quantite_stock INT NOT NULL DEFAULT 0,
         image_principale VARCHAR(255),
-        FOREIGN KEY (id_product) REFERENCES Products (id_product) ON DELETE CASCADE
-        quantity int
-
+        FOREIGN KEY (id_product) REFERENCES Products (id_product) ON DELETE CASCADE quantity int
     );
 
 CREATE TABLE
@@ -164,4 +155,18 @@ CREATE TABLE
         subtotal DECIMAL(10, 2) NOT NULL,
         FOREIGN KEY (order_id) REFERENCES Orders (id_order) ON DELETE CASCADE,
         FOREIGN KEY (product_id) REFERENCES Products (id_product)
+    );
+
+CREATE TABLE
+    OrderCancellationHistory (
+        id_history INT PRIMARY KEY AUTO_INCREMENT,
+        order_id INT NOT NULL,
+        user_id INT NOT NULL,
+        order_date DATETIME NOT NULL,
+        total_amount DECIMAL(10, 2) NOT NULL,
+        previous_status VARCHAR(50) NOT NULL,
+        items_count INT NOT NULL,
+        cancelled_by VARCHAR(50) DEFAULT 'client', -- 'client' ou 'admin'
+        FOREIGN KEY (order_id) REFERENCES Orders (id_order),
+        FOREIGN KEY (user_id) REFERENCES Users (id_user)
     );
