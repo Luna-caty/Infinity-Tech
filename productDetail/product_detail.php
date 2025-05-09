@@ -7,33 +7,26 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Gestion de l'ajout au panier
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['product_id'])) {
     $user_id = $_SESSION['user_id'];
     $product_id = intval($_POST['product_id']);
 
-    // Vérifier si le produit existe déjà dans le panier
     $check_query = "SELECT * FROM cart WHERE user_id = $user_id AND product_id = $product_id";
     $check_result = mysqli_query($connection, $check_query);
 
     if (mysqli_num_rows($check_result) > 0) {
-        // Produit existe déjà, incrémenter la quantité
         $update_query = "UPDATE cart SET quantity = quantity + 1 WHERE user_id = $user_id AND product_id = $product_id";
         mysqli_query($connection, $update_query);
     } else {
-        // Nouveau produit, l'ajouter au panier
         $insert_query = "INSERT INTO cart (user_id, product_id, quantity) VALUES ($user_id, $product_id, 1)";
         mysqli_query($connection, $insert_query);
     }
 
-    // Stocker un message de confirmation dans la session
     $_SESSION['cart_message'] = "Produit ajouté au panier!";
 
-    // Recharger la page sans redirection
     header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $product_id);
     exit();
 }
-// Récupération des détails du produit
 if (isset($_GET['id'])) {
     $product_id = intval($_GET['id']);
     $query = "SELECT * FROM products WHERE id_product = $product_id";
@@ -91,6 +84,25 @@ if (isset($_GET['id'])) {
 
 <body>
     <?php include '../reusables/navbar.php'; ?>
+    <?php if (isset($_SESSION['cart_message'])): ?>
+        <div class="notification-bar" id="notificationBar">
+            <?php echo $_SESSION['cart_message']; ?>
+        </div>
+        <script>
+            document.getElementById('notificationBar').classList.add('show');
+
+            setTimeout(function() {
+                var bar = document.getElementById('notificationBar');
+                bar.classList.remove('show');
+
+                setTimeout(function() {
+                    bar.remove();
+                }, 300);
+            }, 3000);
+        </script>
+        <?php unset($_SESSION['cart_message']); ?>
+    <?php endif; ?>
+
     <div class="product-detail">
         <div class="product-image">
             <?php
@@ -113,7 +125,6 @@ if (isset($_GET['id'])) {
                 echo $product['prix'] . "€";
                 ?>
             </p>
-            <!-- Formulaire qui pointe vers la page courante -->
             <form action="<?php echo $_SERVER['PHP_SELF'] . '?id=' . htmlspecialchars($product_id); ?>" method="POST">
                 <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_id); ?>">
                 <button id="add-to-cart" type="submit" style="text-decoration: none; color: white;">

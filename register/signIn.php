@@ -13,16 +13,18 @@ if (isset($_POST["signin"])) {
         $user = mysqli_fetch_assoc($result);
 
         // Vérifie le mot de passe
-        if ($password == $user['password']) { // idéalement utiliser password_verify()
+        if ($password == $user['password']) {
 
-            // ✅ Sauvegarder l'ID de l'utilisateur dans la session
             $_SESSION['user_id'] = $user['id_user'];
-            $_SESSION['user_name'] = $user['first_name']; // utile pour l'affichage
+            $_SESSION['user_name'] = $user['first_name'];
 
             if ($user['role'] == 'admin') {
+                $_SESSION['is_admin'] = true;
                 header("Location: ../admin/admin.php");
+                exit();
             } else {
                 header("Location: ../home/home.php");
+                exit();
             }
             exit();
         } else {

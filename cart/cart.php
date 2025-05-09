@@ -2,6 +2,7 @@
 require_once '../register/database.php';
 session_start();
 
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../register/SignIn.php");
     exit;
@@ -63,11 +64,9 @@ if (mysqli_num_rows($result) === 0) {
 $items = array();
 $total = 0;
 while ($item = mysqli_fetch_assoc($result)) {
-    // Calcul avec valeurs brutes
     $subtotal = $item['prix'] * $item['quantity'];
     $total += $subtotal;
 
-    // Formatage pour l'affichage
     $item['prix_formatted'] = number_format($item['prix'], 2);
     $item['subtotal_formatted'] = number_format($subtotal, 2);
     $items[] = $item;

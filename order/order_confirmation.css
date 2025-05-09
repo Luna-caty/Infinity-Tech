@@ -175,3 +175,118 @@ body {
 .close-btn:hover {
   color: black;
 }
+.status-annulée {
+  background-color: #f44336;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  margin-left: 10px;
+}
+.order-status.cancelled {
+  color: #f44336;
+}
+
+.status-badge {
+  background-color: #4caf50;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.status-annulée {
+  background-color: #f44336;
+}
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border-left: 5px solid #c62828;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border-left: 5px solid #2e7d32;
+}
+
+.cancel-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 16px;
+}
+
+.cancel-btn:hover {
+  background-color: #d32f2f;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: 5px;
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.close-btn {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: black;
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 18px;
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+.status-confirmee {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.status-annulee {
+  background-color: #f44336;
+  color: white;
+}
+
+.status-en_attente {
+  background-color: #FFC107;
+  color: black;
+}
