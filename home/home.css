@@ -1,31 +1,13 @@
-html, body {
-    margin: 0;
-    padding: 0;
-    min-height: 100%;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
 }
 body {
   font-family: "Poppins", sans-serif;
   background-color: #f7f7f7;
 }
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.animate-on-load {
-  animation: fadeInUp 1s ease-out forwards;
-  opacity: 0;
-}
-
-
-
-
-
 .hero {
   background: linear-gradient(142deg, #041e3a 0%, #0a4d8c 50%, #0d4c96 100%);
   display: flex;
@@ -62,7 +44,7 @@ body {
   letter-spacing: 1px;
 }
 #callToAction:hover {
-  background: #0a2184; 
+  background: #0a2184;
   cursor: pointer;
 }
 
@@ -304,4 +286,64 @@ footer {
   font-style: normal;
   color: white;
   font-size: 14px;
+}
+#cookie-popup {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #fff8e1;
+  color: #5d4037;
+  border: 2px solid #ffe082;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
+  max-width: 300px;
+  z-index: 1000;
+  display: none;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.cookie-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+#cookie-popup button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#accept-cookie {
+  background-color: #4caf50;
+  color: white;
+}
+
+#reject-cookie {
+  background-color: #f44336;
+  color: white;
+}
+
+#accept-cookie:hover {
+  background-color: #388e3c;
+}
+
+#reject-cookie:hover {
+  background-color: #d32f2f;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

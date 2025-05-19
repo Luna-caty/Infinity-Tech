@@ -2,7 +2,6 @@
 require_once '../register/database.php';
 session_start();
 
-// Créer un cookie si la session existe
 if (isset($_SESSION['user_name'])) {
     setcookie('user_name', $_SESSION['user_name'], time() + (7 * 24 * 60 * 60), "/");
 }
@@ -91,6 +90,35 @@ $random_result = mysqli_query($connection, $random_query);
         }
         ?>
     </section>
+    <?php if (isset($_SESSION['user_name'])): ?>
+        <div id="cookie-popup">
+            <p>🍪 Ce site utilise des cookies pour améliorer votre expérience. Acceptez-vous ?</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookie">J'accepte</button>
+                <button id="reject-cookie">Je refuse</button>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <script>
+        window.onload = function() {
+            const isLoggedIn = <?php echo isset($_SESSION['user_name']) ? 'true' : 'false'; ?>;
+            const hasConsent = document.cookie.split('; ').find(row => row.startsWith('cookie_consent='));
+
+            if (isLoggedIn && !hasConsent) {
+                document.getElementById("cookie-popup").style.display = "block";
+            }
+
+            document.getElementById("accept-cookie").onclick = function() {
+                document.cookie = "cookie_consent=accepted; path=/; max-age=" + (60 * 60);
+                document.getElementById("cookie-popup").style.display = "none";
+            };
+
+            document.getElementById("reject-cookie").onclick = function() {
+                document.getElementById("cookie-popup").style.display = "none";
+            };
+        };
+    </script>
 
     <?php include '../reusables/footer.php'; ?>
 </body>
