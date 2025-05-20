@@ -37,8 +37,6 @@ input {
   align-items: center;
   gap: 15px;
   margin: 20px 0;
-
-  /* padding-top: 30px; */
 }
 .product-card {
   width: 250px;
@@ -47,13 +45,13 @@ input {
   text-align: center;
   background-color: white;
   padding: 15px;
-  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+  
 }
 
 .product-image {
   width: 100%;
-  height: 200px; /* Définit une hauteur fixe */
-  object-fit: contain; /* Ajuste l'image sans la déformer */
+  height: 200px; 
+  object-fit: contain; 
 }
 
 .product-name {

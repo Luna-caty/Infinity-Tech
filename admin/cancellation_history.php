@@ -7,23 +7,20 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['
 
 require_once '../register/database.php';
 
-// Pagination
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $items_per_page = 10;
 $offset = ($page - 1) * $items_per_page;
 
-// Récupérer le nombre total d'enregistrements
 $count_query = "SELECT COUNT(*) as total FROM OrderCancellationHistory";
 $count_result = mysqli_query($connection, $count_query);
 $count_row = mysqli_fetch_assoc($count_result);
 $total_items = $count_row['total'];
 $total_pages = ceil($total_items / $items_per_page);
 
-// Récupérer les annulations de commandes
 $query = "SELECT h.*, u.first_name, u.last_name, u.email
 FROM OrderCancellationHistory h
 JOIN Users u ON h.user_id = u.id_user
-ORDER BY h.id_history DESC  -- Tri par ID au lieu de cancellation_date
+ORDER BY h.id_history DESC  
 LIMIT $offset, $items_per_page";
 
 $result = mysqli_query($connection, $query);
@@ -196,7 +193,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </table>
             </div>
 
-            <!-- Pagination -->
             <?php if ($total_pages > 1): ?>
                 <div class="pagination">
                     <?php if ($page > 1): ?>

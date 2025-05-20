@@ -12,7 +12,6 @@
         footer {
             background: #124e8b;
             color: white;
-            /* padding: 50px 20px; */
             padding-top: 30px;
             font-family: "Poppins", sans-serif;
             margin-top: 50px;

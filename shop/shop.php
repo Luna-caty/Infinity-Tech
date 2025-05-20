@@ -49,7 +49,6 @@ donc le .= nous a aider a concatainer plusieurs requete pour avoir la requete fi
 
 $show_products = mysqli_query($connection, $select);
 
-// Vérification des erreurs de requête
 if (!$show_products) {
     die("Erreur de requête: " . mysqli_error($connection));
 }

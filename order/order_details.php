@@ -11,15 +11,12 @@ $user_id = $_SESSION['user_id'];
 $order_confirmed = false;
 $order_id = 0;
 
-// Traitement de la confirmation de commande
 if (isset($_POST['confirm_order'])) {
     try {
-        // Appel de la procédure stockée
         $stmt = mysqli_prepare($connection, "CALL FinalizeOrder(?, @order_id)");
         mysqli_stmt_bind_param($stmt, "i", $user_id);
 
         if (!mysqli_stmt_execute($stmt)) {
-            // Vérifier si l'erreur concerne le stock
             if (strpos(mysqli_error($connection), 'Stock insuffisant') !== false) {
                 $error_message = "Stock insuffisant pour certains produits de votre panier. Veuillez ajuster vos quantités.";
             } else {
@@ -28,14 +25,12 @@ if (isset($_POST['confirm_order'])) {
         } else {
             mysqli_stmt_close($stmt);
 
-            // Récupération de l'ID de commande généré
-            // Récupération de l'ID de commande généré
             $result = mysqli_query($connection, "SELECT @order_id as order_id");
             $row = mysqli_fetch_assoc($result);
             $order_id = $row['order_id'];
 
             if ($order_id > 0) {
-                // Redirection vers la page de confirmation
+
                 header("Location: order_confirmation.php?order_id=" . $order_id);
                 exit();
             } else if ($order_id == 0) {
@@ -51,34 +46,47 @@ if (isset($_POST['confirm_order'])) {
     }
 }
 
-// Si la commande est confirmée, redirection vers une page de confirmation
 if ($order_confirmed) {
-    // Vous pouvez rediriger vers une page de confirmation ou afficher un message
     header("Location: order_confirmation.php?order_id=" . $order_id);
     exit();
 }
 
-// Get cart items
-$items_query = "SELECT p.id_product, p.name, p.prix, c.quantity, 
-               (p.prix * c.quantity) AS subtotal
-               FROM cart c
-               JOIN products p ON c.product_id = p.id_product
-               WHERE c.user_id = $user_id";
-$items_result = mysqli_query($connection, $items_query);
 
-if (!$items_result) {
-    die("Error in query: " . mysqli_error($connection));
-}
 
+$stmt = mysqli_prepare($connection, "CALL GetOrderDetails(?)");
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+
+$items_result = mysqli_stmt_get_result($stmt);
 $items = array();
-$total = 0;
 while ($item = mysqli_fetch_assoc($items_result)) {
     $items[] = $item;
+}
+
+$total = 0;
+foreach ($items as $item) {
     $total += $item['subtotal'];
 }
+
+if (mysqli_more_results($connection)) {
+    mysqli_next_result($connection);
+    $total_result = mysqli_store_result($connection);
+
+    if ($total_result) {
+        $total_row = mysqli_fetch_assoc($total_result);
+        if (isset($total_row['total_amount']) && $total_row['total_amount'] > 0) {
+            $total = $total_row['total_amount'];
+        }
+    }
+}
+
 $total_formatted = number_format($total, 2);
 
-// Get user details
+while (mysqli_more_results($connection)) {
+    mysqli_next_result($connection);
+    mysqli_store_result($connection);
+}
+
 $user_query = "SELECT * FROM Users WHERE id_user = $user_id";
 $user_result = mysqli_query($connection, $user_query);
 $user = mysqli_fetch_assoc($user_result);

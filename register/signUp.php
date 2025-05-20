@@ -12,7 +12,6 @@ if (isset($_POST["registerButton"])) {
     if (mysqli_num_rows($checkEmail) == 0) {
         $insert = "INSERT INTO users (first_name, last_name, email, password,role) VALUES ('$firstName', '$lastName', '$email', '$password','$role')";
         $result = mysqli_query($connection, $insert);
-        // cet instruction de if($result) c'est de verifier si la requete est effectué avec succes 
         if ($result) {
             header("Location: ../home/home.php");
             exit();

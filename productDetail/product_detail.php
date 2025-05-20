@@ -97,8 +97,8 @@ if (isset($_GET['id'])) {
 
                 setTimeout(function() {
                     bar.remove();
-                }, 300);
-            }, 3000);
+                }, 100);
+            }, 1000);
         </script>
         <?php unset($_SESSION['cart_message']); ?>
     <?php endif; ?>

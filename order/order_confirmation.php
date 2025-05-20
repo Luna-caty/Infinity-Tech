@@ -9,14 +9,14 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Ajout: Vérifier si une erreur de stock a été stockée dans la session
+// Vérifier si une erreur de stock a été stockée dans la session
 $error_message = "";
 if (isset($_SESSION['stock_error'])) {
     $error_message = $_SESSION['stock_error'];
-    unset($_SESSION['stock_error']); // Nettoyer la variable de session
+    unset($_SESSION['stock_error']);
 }
 
-// Ajout: Gérer l'annulation de commande
+// Gérer l'annulation de commande
 if (isset($_POST['cancel_order']) && isset($_POST['order_id'])) {
     $order_id_to_cancel = intval($_POST['order_id']);
 
@@ -67,7 +67,7 @@ if ($order['status'] === 'en_attente') {
     $order = mysqli_fetch_assoc($order_result);
 }
 
-// Ajout: Vérifier si un message d'annulation existe
+// Vérifier si un message d'annulation existe
 $cancel_message = "";
 if (isset($_SESSION['cancel_message'])) {
     $cancel_message = $_SESSION['cancel_message'];
@@ -92,14 +92,12 @@ if (isset($_SESSION['cancel_message'])) {
 <body>
     <?php include '../reusables/navbar.php'; ?>
     <div class="confirmation-container">
-        <!-- Ajout: Affichage du message d'erreur s'il existe -->
         <?php if (!empty($error_message)): ?>
             <div class="error-message">
                 <strong>Erreur:</strong> <?php echo $error_message; ?>
             </div>
         <?php endif; ?>
 
-        <!-- Ajout: Affichage du message de confirmation d'annulation -->
         <?php if (!empty($cancel_message)): ?>
             <div class="success-message">
                 <?php echo $cancel_message; ?>
@@ -129,15 +127,6 @@ if (isset($_SESSION['cancel_message'])) {
         <div class="confirmation-header">
             <h1>
                 Commande <?php echo $order['status'] === 'annulée' ? 'Annulée' : ($order['status'] === 'confirmée' ? 'Confirmée' : 'En Attente'); ?>
-                <span class="status-badge status-<?php echo str_replace('é', 'e', $order['status']); ?>">
-                    <?php if ($order['status'] === 'confirmée'): ?>
-                        ✓
-                    <?php elseif ($order['status'] === 'annulée'): ?>
-                        ✕
-                    <?php else: ?>
-                        ⏳
-                    <?php endif; ?>
-                </span>
             </h1>
             <p class="order-number">Commande #<?php echo $order_id; ?></p>
         </div>
@@ -159,12 +148,12 @@ if (isset($_SESSION['cancel_message'])) {
 
             <div class="confirmation-actions">
                 <a href="../shop/shop.php" class="continue-shopping-btn">Continuer les achats</a>
-                <a href="orders.php" class="view-orders-btn">Voir mes commandes</a>
+                <a href="order_history.php" class="view-orders-btn">Voir mes commandes</a>
 
                 <?php if ($order['status'] === 'confirmée'): ?>
                     <button id="cancelOrderBtn" class="cancel-btn">Annuler la commande</button>
 
-                    <!-- Formulaire caché pour l'annulation -->
+                    
                     <form id="cancelOrderForm" method="post" style="display: none;">
                         <input type="hidden" name="order_id" value="<?php echo $order_id; ?>">
                         <input type="hidden" name="cancel_order" value="1">
@@ -173,9 +162,21 @@ if (isset($_SESSION['cancel_message'])) {
             </div>
         </div>
 
-        <!-- Ajout: Script pour gérer l'annulation -->
+        
+        <div id="cancelModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2>Confirmer l'annulation</h2>
+                <p>Êtes-vous sûr de vouloir annuler cette commande ?</p>
+                <div class="modal-buttons">
+                    <button id="cancelCancelBtn" class="btn secondary">Non</button>
+                    <button id="confirmCancelBtn" class="btn primary">Oui, annuler</button>
+                </div>
+            </div>
+        </div>
+
         <script>
-            // Récupérer les éléments
+           
             const cancelOrderBtn = document.getElementById('cancelOrderBtn');
             const cancelModal = document.getElementById('cancelModal');
             const closeBtn = document.querySelector('.close-btn');
@@ -183,35 +184,40 @@ if (isset($_SESSION['cancel_message'])) {
             const confirmCancelBtn = document.getElementById('confirmCancelBtn');
             const cancelOrderForm = document.getElementById('cancelOrderForm');
 
-            // Ouvrir la popup quand on clique sur le bouton d'annulation
+            
             if (cancelOrderBtn) {
                 cancelOrderBtn.addEventListener('click', function() {
                     cancelModal.style.display = 'block';
                 });
             }
 
-            // Fermer la popup quand on clique sur ×
-            closeBtn.addEventListener('click', function() {
-                cancelModal.style.display = 'none';
-            });
+           
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    cancelModal.style.display = 'none';
+                });
+            }
 
-            // Fermer la popup quand on clique sur "Non"
-            cancelCancelBtn.addEventListener('click', function() {
-                cancelModal.style.display = 'none';
-            });
+            
+            if (cancelCancelBtn) {
+                cancelCancelBtn.addEventListener('click', function() {
+                    cancelModal.style.display = 'none';
+                });
+            }
 
-            // Soumettre le formulaire quand on clique sur "Oui"
-            confirmCancelBtn.addEventListener('click', function() {
-                cancelOrderForm.submit();
-            });
+            if (confirmCancelBtn) {
+                confirmCancelBtn.addEventListener('click', function() {
+                    cancelOrderForm.submit();
+                });
+            }
 
-            // Fermer la popup si on clique en dehors
             window.addEventListener('click', function(event) {
                 if (event.target === cancelModal) {
                     cancelModal.style.display = 'none';
                 }
             });
         </script>
+    </div>
 </body>
 
 </html>

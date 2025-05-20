@@ -1,5 +1,5 @@
 <?php
-require_once '../register/database.php'; // Assure-toi que $connection est bien défini dedans
+require_once '../register/database.php'; 
 session_start();
 if (isset($_POST['add-product'])) {
     echo 'Soumission reçue<br>';
@@ -9,7 +9,6 @@ if (isset($_POST['add-product'])) {
     $category = $_POST['category'];
     $image_name = '';
 
-    // Gestion de l'image
     if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] == 0) {
         $image_name = basename($_FILES['product_image']['name']);
         $temp_name = $_FILES['product_image']['tmp_name'];
@@ -22,13 +21,11 @@ if (isset($_POST['add-product'])) {
         die("Aucune image téléchargée ou erreur dans le fichier.");
     }
 
-    // Insertion du produit de base
     $add_query = "INSERT INTO products (name, prix, image_principale, type) VALUES ('$name', '$price', '$image_name', '$category')";
     $add_product = mysqli_query($connection, $add_query) or die("Erreur SQL PRODUIT : " . mysqli_error($connection));
     $id_product = mysqli_insert_id($connection);
 
 
-    // Insertion des détails selon la catégorie
     if ($category == 'laptop') {
         $marque = $_POST['marque'];
         $cpu = $_POST['cpu'];
@@ -81,7 +78,6 @@ if (isset($_POST['add-product'])) {
                        VALUES ('$name', '$marque', '$type_composant', '$capicite', '$specifications', '$compatibilite', '$description', '$price', '$image_name','$id_product')";
     }
 
-    // Exécute la requête détail seulement si définie
     if (isset($add_query2)) {
         $add_product_details = mysqli_query($connection, $add_query2) or die("Erreur SQL DÉTAILS : " . mysqli_error($connection));
     }

@@ -63,7 +63,7 @@ body {
 #welcomeP span {
   color: #12298c;
 }
-/* Style général pour le tableau d'administration */
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
@@ -88,7 +88,6 @@ body {
   font-size: 14px;
 }
 
-/* Corps du tableau */
 .admin-table tbody tr {
   border-bottom: 1px solid #dddddd;
   transition: background-color 0.3s;
@@ -107,7 +106,6 @@ body {
   vertical-align: middle;
 }
 
-/* Image du produit */
 .product-image {
   width: 60px;
   height: 60px;
@@ -116,7 +114,6 @@ body {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Bouton d'action */
 .see-more-btn,
 .edit-btn {
   display: inline-block;
@@ -163,7 +160,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* Style pour les prix */
 .price-column {
   font-weight: 600;
   color: #2c3e50;
@@ -178,7 +174,6 @@ body {
   background-color: #d3d3d3;
 }
 
-/* partie Insert */
 
 .product-form-container {
   max-width: 800px;

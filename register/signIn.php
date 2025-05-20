@@ -12,7 +12,6 @@ if (isset($_POST["signin"])) {
     if (mysqli_num_rows($result) == 1) {
         $user = mysqli_fetch_assoc($result);
 
-        // Vérifie le mot de passe
         if ($password == $user['password']) {
 
             $_SESSION['user_id'] = $user['id_user'];

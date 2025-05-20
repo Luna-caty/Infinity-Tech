@@ -2,19 +2,16 @@
 require_once '../register/database.php';
 session_start();
 
-// 🔐 Vérifier si l'utilisateur est connecté et est un administrateur
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     header("Location: ../home/home.php");
     exit();
 }
 
-// ✅ Vérifier si l'ID est valide
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("ID de produit manquant");
 }
 $product_id = intval($_GET['id']);
 
-// ✅ Récupérer les données du produit
 $query = "SELECT * FROM products WHERE id_product = $product_id";
 $result = mysqli_query($connection, $query);
 $product = mysqli_fetch_assoc($result);
@@ -23,22 +20,20 @@ if (!$product) {
     die("Produit introuvable");
 }
 
-// ✅ Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['name'], $_POST['price'], $_POST['category'])) {
         $name = mysqli_real_escape_string($connection, $_POST['name']);
         $price = floatval($_POST['price']);
         $category = mysqli_real_escape_string($connection, $_POST['category']);
-        $image = $product['image_principale']; // Garder l'ancienne image par défaut
+        $image = $product['image_principale']; 
 
-        // ✅ Nouvelle image ?
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $image_tmp_name = $_FILES['image']['tmp_name'];
             $image_name = basename($_FILES['image']['name']);
             $upload_dir = '../assets/';
 
             if (move_uploaded_file($image_tmp_name, $upload_dir . $image_name)) {
-                $image = $image_name; // Juste le nom, car tu ajoutes ../assets/ dans le HTML
+                $image = $image_name; 
             } else {
                 echo "Erreur lors du téléchargement de l'image.";
             }

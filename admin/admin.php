@@ -8,12 +8,11 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['
 require_once '../register/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product'], $_POST['product_id'])) {
-    $product_id = intval($_POST['product_id']); // Sécuriser l’ID
+    $product_id = intval($_POST['product_id']); 
 
     $delete_query = "DELETE FROM products WHERE id_product = $product_id";
     $delete_result = mysqli_query($connection, $delete_query);
 
-    // Optionnel : message flash via session
     $_SESSION['delete_success'] = true;
     header("Location: admin.php");
     exit();

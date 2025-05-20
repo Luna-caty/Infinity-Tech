@@ -144,7 +144,6 @@ CREATE TABLE
         FOREIGN KEY (user_id) REFERENCES Users (id_user) ON DELETE CASCADE
     );
 
--- Créer la table des items de commande
 CREATE TABLE
     OrderItems (
         id_order_item INT PRIMARY KEY AUTO_INCREMENT,

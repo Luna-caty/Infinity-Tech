@@ -157,7 +157,7 @@ require_once '../register/database.php';
                         </div>
                     </div>
                 <?php else: ?>
-                    <a href="../register/signUp.php" class="register-btn">Register</a>
+                    <a href="../register/signIn.php" class="register-btn">Register</a>
                 <?php endif; ?>
             </div>
         </div>

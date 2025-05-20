@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Vérifier si l'ID de commande est fourni
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     header("Location: order_history.php");
     exit;
@@ -17,12 +16,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $order_id = intval($_GET['id']);
 
-// Récupérer les informations générales de la commande
-$query = "SELECT o.id_order, o.user_id, o.order_date, o.status, o.total_amount, u.first_name, u.last_name, u.email
-          FROM Orders o
-          JOIN Users u ON o.user_id = u.id_user
-          WHERE o.id_order = ?";
-$stmt = mysqli_prepare($connection, $query);
+$stmt = mysqli_prepare($connection, "CALL GetCompletedOrderDetails(?)");
 mysqli_stmt_bind_param($stmt, "i", $order_id);
 mysqli_stmt_execute($stmt);
 $order_info = mysqli_stmt_get_result($stmt);
@@ -34,21 +28,13 @@ if (mysqli_num_rows($order_info) === 0) {
 
 $order = mysqli_fetch_assoc($order_info);
 
-// Vérifier si la commande appartient à l'utilisateur connecté
 if ($order['user_id'] != $user_id) {
     header("Location: order_history.php");
     exit;
 }
 
-// Récupérer les détails des articles
-$items_query = "SELECT oi.product_id, p.name, p.image_principale, oi.quantity, oi.price_per_unit, oi.subtotal
-               FROM OrderItems oi
-               JOIN Products p ON oi.product_id = p.id_product
-               WHERE oi.order_id = ?";
-$items_stmt = mysqli_prepare($connection, $items_query);
-mysqli_stmt_bind_param($items_stmt, "i", $order_id);
-mysqli_stmt_execute($items_stmt);
-$items_result = mysqli_stmt_get_result($items_stmt);
+mysqli_next_result($connection);
+$items_result = mysqli_store_result($connection);
 ?>
 
 <!DOCTYPE html>
@@ -63,241 +49,6 @@ $items_result = mysqli_stmt_get_result($items_stmt);
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="view_completed_order.css">
     <link rel="icon" href="../assets/icon2.png" type="image/png">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-
-        .view-order-container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
-        }
-
-        .back-link {
-            margin-bottom: 20px;
-        }
-
-        .back-link a {
-            text-decoration: none;
-            color: #666;
-            font-size: 0.95rem;
-            transition: color 0.3s;
-        }
-
-        .back-link a:hover {
-            color: #4CAF50;
-        }
-
-        .order-header {
-            margin-bottom: 30px;
-        }
-
-        .order-header h1 {
-            margin: 0 0 10px 0;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .order-meta {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .order-date {
-            color: #666;
-            font-size: 0.95rem;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .status-en_attente {
-            background-color: #FFF8E1;
-            color: #FFA000;
-        }
-
-        .status-confirmée {
-            background-color: #E8F5E9;
-            color: #4CAF50;
-        }
-
-        .status-expédiée {
-            background-color: #E3F2FD;
-            color: #2196F3;
-        }
-
-        .status-livrée {
-            background-color: #E0F2F1;
-            color: #009688;
-        }
-
-        .status-annulée {
-            background-color: #FFEBEE;
-            color: #F44336;
-        }
-
-        .order-content {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-
-        .customer-info {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-        }
-
-        h2 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #444;
-        }
-
-        .customer-info p {
-            margin: 8px 0;
-            color: #666;
-        }
-
-        .customer-info p strong {
-            color: #333;
-            margin-right: 5px;
-        }
-
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .items-table th,
-        .items-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        .items-table th {
-            font-weight: 600;
-            color: #444;
-            background-color: #f9f9f9;
-        }
-
-        .product-cell {
-            width: 40%;
-        }
-
-        .product-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .product-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .product-name {
-            font-weight: 500;
-        }
-
-        .items-table tfoot {
-            font-weight: 600;
-        }
-
-        .total-label {
-            text-align: right;
-        }
-
-        .total-value {
-            color: #4CAF50;
-            font-size: 1.1rem;
-        }
-
-        @media (max-width: 768px) {
-            .order-meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .items-table th {
-                display: none;
-            }
-
-            .items-table,
-            .items-table tbody,
-            .items-table tr,
-            .items-table td {
-                display: block;
-                width: 100%;
-            }
-
-            .items-table tr {
-                margin-bottom: 20px;
-                border: 1px solid #eee;
-                border-radius: 5px;
-            }
-
-            .items-table td {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                text-align: right;
-                padding: 10px 15px;
-            }
-
-            .items-table td:before {
-                content: attr(data-label);
-                font-weight: 600;
-                margin-right: 10px;
-            }
-
-            .product-cell {
-                width: 100%;
-            }
-
-            .product-info {
-                width: 100%;
-                justify-content: flex-start;
-            }
-
-            .items-table tfoot {
-                display: block;
-            }
-
-            .items-table tfoot tr {
-                margin-bottom: 0;
-                border: none;
-            }
-
-            .total-label {
-                text-align: left;
-            }
-        }
-    </style>
 </head>
 
 <body>
